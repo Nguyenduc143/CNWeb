@@ -1,0 +1,33 @@
+﻿
+Name                                           
+----                                           
+Driver da Microsoft para arquivos texto (*.t...
+Driver do Microsoft Access (*.mdb)             
+Driver do Microsoft dBase (*.dbf)              
+Driver do Microsoft Excel(*.xls)               
+Driver do Microsoft Paradox (*.db )            
+Microsoft Access Driver (*.mdb)                
+Microsoft Access-Treiber (*.mdb)               
+Microsoft dBase Driver (*.dbf)                 
+Microsoft dBase-Treiber (*.dbf)                
+Microsoft Excel Driver (*.xls)                 
+Microsoft Excel-Treiber (*.xls)                
+Microsoft ODBC for Oracle                      
+Microsoft Paradox Driver (*.db )               
+Microsoft Paradox-Treiber (*.db )              
+Microsoft Text Driver (*.txt; *.csv)           
+Microsoft Text-Treiber (*.txt; *.csv)          
+SQL Server                                     
+ODBC Driver 17 for SQL Server                  
+ODBC Driver 18 for SQL Server                  
+SQL Server                                     
+ODBC Driver 17 for SQL Server                  
+ODBC Driver 18 for SQL Server                  
+SQL Server Native Client RDA 11.0              
+Microsoft Access Driver (*.mdb, *.accdb)       
+Microsoft Excel Driver (*.xls, *.xlsx, *.xls...
+Microsoft Access Text Driver (*.txt, *.csv)    
+Microsoft Access dBASE Driver (*.dbf, *.ndx,...
+
+
+
