@@ -7,6 +7,7 @@ const ProfilePage: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('account'); // Tabs: account, address, orders
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const ProfilePage: React.FC = () => {
       setFullName(user.fullName || '');
       setPhone(user.phone || '');
       setEmail(user.username || '');
+      setRole(user.role || 'Customer');
       setLoading(false);
     } catch (error) {
       navigate('/login');
@@ -89,6 +91,18 @@ const ProfilePage: React.FC = () => {
                 <span>Đơn Mua Của Bạn</span>
               </button>
             </li>
+            {role === 'Admin' && (
+              <li>
+                <button 
+                  className="sidebar-link"
+                  onClick={() => navigate('/admin')}
+                  style={{ color: '#288ad6', fontWeight: 'bold' }}
+                >
+                  <ion-icon name="shield-checkmark-outline" style={{ color: '#288ad6' }}></ion-icon>
+                  <span>Bảng Điều Khiển Admin</span>
+                </button>
+              </li>
+            )}
             <li style={{ borderTop: '1px solid #f0f0f0', marginTop: '10px', paddingTop: '10px' }}>
               <button className="sidebar-link" onClick={handleLogout} style={{color: '#d32f2f'}}>
                 <ion-icon name="log-out-outline" style={{color: '#d32f2f'}}></ion-icon>

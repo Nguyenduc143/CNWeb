@@ -31,7 +31,7 @@ export const authService = {
       Username: user.Email,
       FullName: user.FullName,
       PhoneNumber: user.PhoneNumber,
-      Role: 'Customer' // Tạm thời hardcode, sau này join bảng UserRoles
+      Role: user.Role || 'Customer' // Tạm thời hardcode, sau này join bảng UserRoles
     };
   },
 

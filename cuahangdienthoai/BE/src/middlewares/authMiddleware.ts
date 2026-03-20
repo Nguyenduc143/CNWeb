@@ -25,3 +25,12 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     res.status(401).json({ message: 'Phiên đăng nhập đã hết hạn hoặc Token bị làm giả.' });
   }
 };
+
+// Middleware kiểm tra quyền Quản trị viên (Admin Barrier)
+export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user || req.user.role !== 'Admin') {
+    res.status(403).json({ message: 'Truy cập bị từ chối! Bạn không có quyền Quản trị viên (Admin).' });
+    return;
+  }
+  next();
+};
