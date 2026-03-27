@@ -15,9 +15,15 @@ import CheckoutPage from './pages/checkout/CheckoutPage';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProductManager from './pages/admin/ProductManager';
+import CategoryManager from './pages/admin/CategoryManager';
+import OrderManager from './pages/admin/OrderManager';
+import UserManager from './pages/admin/UserManager';
+import { useScrollTop } from './hooks/useScrollTop';
 import './index.css';
 
 const StorefrontLayout = () => {
+  useScrollTop(); // Gọi Hook Cuộn Đầu Trang
+
   return (
     <>
       <Header />
@@ -57,6 +63,9 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<ProductManager />} />
+            <Route path="categories" element={<CategoryManager />} />
+            <Route path="orders" element={<OrderManager />} />
+            <Route path="users" element={<UserManager />} />
           </Route>
         </Routes>
       </div>

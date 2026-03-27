@@ -13,6 +13,69 @@ export const adminController = {
     }
   },
 
+  // --- Danh mục CRUD ---
+  getCategories: async (req: Request, res: Response) => {
+    try {
+      const cates = await adminService.getCategories();
+      return success(res, { categories: cates }, 'Lấy danh mục thành công');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  createCategory: async (req: Request, res: Response) => {
+    try {
+      const newCate = await adminService.createCategory(req.body);
+      return success(res, { category: newCate }, 'Tạo danh mục xong');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  updateCategory: async (req: Request, res: Response) => {
+    try {
+      await adminService.updateCategory(Number(req.params.id), req.body);
+      return success(res, null, 'Cập nhật xong');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  deleteCategory: async (req: Request, res: Response) => {
+    try {
+      await adminService.deleteCategory(Number(req.params.id));
+      return success(res, null, 'Xóa danh mục xong');
+    } catch (err) { return error(res, 'Không thể xóa do bị ràng buộc', 400); }
+  },
+
+  // --- Đơn hàng ---
+  getAllOrders: async (req: Request, res: Response) => {
+    try {
+      const orders = await adminService.getAllOrders();
+      return success(res, { orders }, 'Lấy danh sách đơn hàng thành công');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  updateOrderStatus: async (req: Request, res: Response) => {
+    try {
+      const { status } = req.body;
+      await adminService.updateOrderStatus(req.params.id as string, status);
+      return success(res, null, 'Cập nhật trạng thái đơn thành công');
+    } catch (err) { return error(res, 'Lỗi cập nhật', 500); }
+  },
+
+  // --- Thành viên ---
+  getAllUsers: async (req: Request, res: Response) => {
+    try {
+      const users = await adminService.getAllUsers();
+      return success(res, { users }, 'Danh sách người dùng');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  toggleUserLock: async (req: Request, res: Response) => {
+    try {
+      const { isLocked } = req.body;
+      await adminService.toggleUserLock(req.params.id as string, isLocked);
+      return success(res, null, isLocked ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản');
+    } catch (err) { return error(res, 'Lỗi thay đổi trạng thái', 500); }
+  },
+  changeUserRole: async (req: Request, res: Response) => {
+    try {
+      const { role } = req.body;
+      await adminService.changeUserRole(req.params.id as string, role);
+      return success(res, null, 'Đã cập nhật phân quyền thành công');
+    } catch (err) { return error(res, 'Lỗi thay đổi quyền', 500); }
+  },
+
   // Lấy toàn bộ Sản Phẩm Grid
   getAllProducts: async (req: Request, res: Response) => {
     try {

@@ -20,6 +20,9 @@ const ProfilePage: React.FC = () => {
     fullName: '', phone: '', addressLine: '', ward: '', district: '', province: '', note: ''
   });
 
+  // Orders State
+  const [orders, setOrders] = useState<any[]>([]);
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -27,6 +30,8 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     if (activeTab === 'address') {
       loadAddresses();
+    } else if (activeTab === 'orders') {
+      loadOrders();
     }
   }, [activeTab]);
 
@@ -48,6 +53,15 @@ const ProfilePage: React.FC = () => {
     try {
       const res: any = await checkoutApi.getAddresses();
       setAddresses(res.addresses || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadOrders = async () => {
+    try {
+      const res: any = await checkoutApi.getOrderHistory();
+      setOrders(res.orders || []);
     } catch (err) {
       console.error(err);
     }
@@ -232,11 +246,46 @@ const ProfilePage: React.FC = () => {
           )}
 
           {activeTab === 'orders' && (
-            <div style={{ padding: '40px 0', textAlign: 'center', color: '#757575' }}>
-              <ion-icon name="receipt-outline" style={{ fontSize: '48px', color: '#e0e0e0' }}></ion-icon>
-              <h3>Chưa có đơn hàng</h3>
-              <p>Bạn vẫn chưa thực hiện giao dịch nào trên hệ thống.</p>
-            </div>
+            <>
+              <div className="profile-main-header">
+                <h2>Lịch Sử Mua Hàng</h2>
+                <p>Theo dõi trạng thái các đơn hàng bạn đã mua</p>
+              </div>
+              
+              {orders.length === 0 ? (
+                <div style={{ padding: '40px 0', textAlign: 'center', color: '#757575' }}>
+                  <ion-icon name="receipt-outline" style={{ fontSize: '48px', color: '#e0e0e0' }}></ion-icon>
+                  <h3>Chưa có đơn hàng</h3>
+                  <p>Bạn vẫn chưa thực hiện giao dịch nào trên hệ thống.</p>
+                </div>
+              ) : (
+                <div className="address-list">
+                  {orders.map((o: any) => {
+                    let statusText = 'Chờ Xử Lý';
+                    let statusColor = 'orange';
+                    if (o.Status === 1) { statusText = 'Đang Giao'; statusColor = '#1677ff'; }
+                    if (o.Status === 2) { statusText = 'Hoàn Tất'; statusColor = '#52c41a'; }
+                    if (o.Status === 3) { statusText = 'Đã Hủy'; statusColor = '#ff4d4f'; }
+                    
+                    return (
+                      <div className="address-card" key={o.OrderId} style={{ borderLeft: `5px solid ${statusColor}`, marginBottom: 15 }}>
+                        <div className="name-phone" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: 10 }}>
+                          <span style={{ fontFamily: 'monospace', fontSize: 16 }}>#{o.OrderId?.split('-')[0].toUpperCase()}</span>
+                          <span style={{ color: statusColor, fontWeight: 'bold' }}>{statusText}</span>
+                        </div>
+                        <div className="address-details" style={{ marginTop: 15, fontSize: 15, lineHeight: 1.6 }}>
+                          <div><strong>Ngày Đặt:</strong> {new Date(o.CreatedAt).toLocaleString('vi-VN')}</div>
+                          <div><strong>Phương Thức C.Toán:</strong> {o.PaymentMethod}</div>
+                          <div style={{ marginTop: 10, fontSize: 18 }}>
+                            <strong>Tổng Tiền:</strong> <span style={{ color: '#d32f2f' }}>{o.Total?.toLocaleString('vi-VN')} ₫</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </main>
         

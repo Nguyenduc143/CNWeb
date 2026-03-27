@@ -7,12 +7,99 @@ export const adminService = {
     const pool = await getConnection();
     const result = await pool.request().query(`
       SELECT 
-        (SELECT SUM(Total) FROM Orders WHERE Status = 0) as Revenue,
+        ISNULL((SELECT SUM(Total) FROM Orders WHERE Status = 3), 0) as Revenue,
         (SELECT count(*) FROM Orders WHERE Status = 0) as PendingOrders,
         (SELECT count(*) FROM Products WHERE Stock > 0) as ActiveProducts,
-        (SELECT count(*) FROM Users WHERE Role = 'Customer') as TotalCustomers
+        (SELECT count(*) FROM Users) as TotalCustomers
     `);
+    
+    const monthlyRevenue = [
+      { name: 'Tháng 1', revenue: 120000000 },
+      { name: 'Tháng 2', revenue: 155000000 },
+      { name: 'Tháng 3', revenue: 195000000 },
+      { name: 'Tháng 4', revenue: 220000000 },
+      { name: 'Tháng 5', revenue: 180000000 },
+      { name: 'Tháng 6', revenue: 250000000 },
+    ];
+    
+    return { ...result.recordset[0], monthlyRevenue };
+  },
+
+  // --- QUẢN LÝ TÊN DANH MỤC ---
+  getCategories: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().query('SELECT * FROM Categories ORDER BY CategoryId DESC');
+    return result.recordset;
+  },
+  createCategory: async (data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+        .input('Name', sql.NVarChar, data.name)
+        .input('Slug', sql.VarChar, data.name.toLowerCase().replace(/ /g, '-'))
+        .query('INSERT INTO Categories (Name, Slug) OUTPUT INSERTED.* VALUES (@Name, @Slug)');
     return result.recordset[0];
+  },
+  updateCategory: async (id: number, data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+        .input('Id', sql.Int, id)
+        .input('Name', sql.NVarChar, data.name)
+        .query('UPDATE Categories SET Name=@Name WHERE CategoryId=@Id');
+    return result.rowsAffected[0] > 0;
+  },
+  deleteCategory: async (id: number) => {
+    const pool = await getConnection();
+    await pool.request().input('Id', sql.Int, id).query('DELETE FROM Categories WHERE CategoryId=@Id');
+    return true;
+  },
+
+  // --- QUẢN LÝ ĐƠN HÀNG ---
+  getAllOrders: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().query(`
+      SELECT O.*, U.FullName as CustomerName, U.Email as CustomerEmail,
+             (SELECT TOP 1 A.ReceiverName + ' - ' + A.ReceiverPhone + ' - ' + A.Line1 + ', ' + A.Ward + ', ' + A.District + ', ' + A.Province 
+              FROM Addresses A WHERE A.AddressId = O.AddressId) AS Address
+      FROM Orders O
+      LEFT JOIN Users U ON O.CustomerId = U.UserId
+      ORDER BY O.CreatedAt DESC
+    `);
+    return result.recordset;
+  },
+  updateOrderStatus: async (orderId: string, status: number) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('OrderId', sql.UniqueIdentifier, orderId)
+      .input('Status', sql.Int, status)
+      .query('UPDATE Orders SET Status = @Status, UpdatedAt = GETDATE() WHERE OrderId = @OrderId');
+    return result.rowsAffected[0] > 0;
+  },
+
+  // --- QUẢN LÝ THÀNH VIÊN ---
+  getAllUsers: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().query(`
+      SELECT UserId, Email, PhoneNumber, FullName, IsLocked, CreatedAt, Role
+      FROM Users
+      ORDER BY CreatedAt DESC
+    `);
+    return result.recordset;
+  },
+  toggleUserLock: async (userId: string, isLocked: boolean) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('UserId', sql.UniqueIdentifier, userId)
+      .input('IsLocked', sql.Bit, isLocked ? 1 : 0)
+      .query('UPDATE Users SET IsLocked = @IsLocked, UpdatedAt = GETDATE() WHERE UserId = @UserId');
+    return result.rowsAffected[0] > 0;
+  },
+  changeUserRole: async (userId: string, role: string) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('UserId', sql.UniqueIdentifier, userId)
+      .input('Role', sql.NVarChar, role)
+      .query('UPDATE Users SET Role = @Role, UpdatedAt = GETDATE() WHERE UserId = @UserId');
+    return result.rowsAffected[0] > 0;
   },
 
   // --- QUẢN LÝ SẢN PHẨM ---
