@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import HeroBanner from '../components/ui/HeroBanner';
 import FlashSale from '../components/ui/FlashSale';
 import ProductSection from '../components/ui/ProductSection';
 import RepairSection from '../components/ui/RepairSection';
-import { iphoneProducts, samsungProducts } from '../data/products';
+import catalogApi from '../api/catalogApi';
 import '../assets/HomePage.css';
 
 const HomePage: React.FC = () => {
+  const [iphones, setIphones] = useState<any[]>([]);
+  const [samsungs, setSamsungs] = useState<any[]>([]);
+
+  useEffect(() => {
+    // BrandId=1 là Apple
+    catalogApi.getProducts({ brandId: 1, pageSize: 4 })
+      .then((res: any) => setIphones(res.data?.products || res.products || []))
+      .catch(console.error);
+
+    // BrandId=2 là Samsung
+    catalogApi.getProducts({ brandId: 2, pageSize: 4 })
+      .then((res: any) => setSamsungs(res.data?.products || res.products || []))
+      .catch(console.error);
+  }, []);
+
   return (
     <main>
       <HeroBanner />
@@ -16,25 +31,21 @@ const HomePage: React.FC = () => {
       <ProductSection
         title="iPhone"
         icon="🍎"
-        products={iphoneProducts}
+        products={iphones}
         viewAllLink="/iphone"
         subCategories={[
-          { label: 'iPhone 16 Series', href: '/iphone-16' },
-          { label: 'iPhone 15 Series', href: '/iphone-15' },
-          { label: 'iPhone 14 Series', href: '/iphone-14' },
-          { label: 'iPhone 13 Series', href: '/iphone-13' },
+          { label: 'iPhone Nhập Khẩu Mới', href: '/iphone' },
         ]}
       />
 
       <ProductSection
         title="Samsung Galaxy"
         icon="📟"
-        products={samsungProducts}
+        products={samsungs}
         viewAllLink="/samsung"
         subCategories={[
-          { label: 'Galaxy S Series', href: '/samsung-s' },
-          { label: 'Galaxy Z Fold/Flip', href: '/samsung-z' },
-          { label: 'Galaxy Note', href: '/samsung-note' },
+          { label: 'Galaxy S Series', href: '/samsung' },
+          { label: 'Galaxy Z Fold/Flip', href: '/samsung' },
         ]}
       />
 

@@ -1,10 +1,18 @@
-import React from 'react';
-import { repairProducts } from '../../data/products';
+import React, { useState, useEffect } from 'react';
+import catalogApi from '../../api/catalogApi';
 import '../../assets/RepairSection.css';
 
 const LOCATIONS = ['94 Thái Hà', '398 Cầu Giấy'];
 
 const RepairSection: React.FC = () => {
+  const [repairProducts, setRepairProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    catalogApi.getProducts({ categoryId: 7, pageSize: 4 })
+      .then((res: any) => setRepairProducts(res.data?.products || res.products || []))
+      .catch(console.error);
+  }, []);
+
   return (
     <section className="repair-section">
       <div className="container">
@@ -20,7 +28,7 @@ const RepairSection: React.FC = () => {
           {repairProducts.map((s) => (
             <div key={s.ProductId} className="repair-card">
               <div className="repair-img-wrap">
-                <img src={s.Images?.[0]?.ImageUrl ?? ''} alt={s.Name} />
+                <img src={s.Image1 || s.Images?.[0]?.ImageUrl || ''} alt={s.Name} />
               </div>
               <div className="repair-info">
                 <h3 className="repair-name">{s.Name}</h3>

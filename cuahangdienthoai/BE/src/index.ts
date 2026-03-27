@@ -18,6 +18,14 @@ app.use(express.json());
 // Nối Route Hệ thống Auth
 app.use('/api/auth', authRoutes);
 
+// Mảng API Hướng Nội (yêu cầu Token)
+import checkoutRoutes from './routes/checkoutRoutes';
+app.use('/api/user', checkoutRoutes);
+
+// Mảng API Đặc Quyền (Admin CMS)
+import adminRoutes from './routes/adminRoutes';
+app.use('/api/admin', adminRoutes);
+
 // Mảng API Catalog Mở (Không khóa JWT) truy xuất thẳng từ gốc /api
 app.use('/api', catalogRoutes);
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Product } from '../../data/types';
+import { useCart } from '../../context/CartContext';
 import '../../assets/ProductCard.css';
 
 interface ProductCardProps {
@@ -22,7 +23,8 @@ const isNew = (createdAt: string): boolean => {
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const thumbUrl = product.Images?.[0]?.ImageUrl ?? '';
+  const { addToCart } = useCart();
+  const thumbUrl = product.Image1 || product.Images?.[0]?.ImageUrl || '';
   const discount = calcDiscount(product.PriceSell, product.PriceImport);
   const showNew = isNew(product.CreatedAt);
 
@@ -62,7 +64,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <span className={`stock-badge ${product.Stock > 0 ? 'in-stock' : 'no-stock'}`}>
             {product.Stock > 0 ? `Còn ${product.Stock}` : 'Hết hàng'}
           </span>
-          <button className="btn-cart" disabled={product.Stock === 0}><ion-icon name="cart-outline"></ion-icon> Mua</button>
+          <button 
+            className="btn-cart" 
+            disabled={product.Stock === 0}
+            onClick={(e) => {
+              e.preventDefault();
+              addToCart({
+                productId: product.ProductId,
+                productName: product.Name,
+                price: product.PriceSell,
+                quantity: 1,
+                image: thumbUrl
+              });
+              alert(`Giỏ hàng đã ghi nhận: ${product.Name}`);
+            }}
+          >
+            <ion-icon name="cart-outline"></ion-icon> Mua
+          </button>
         </div>
       </div>
     </div>

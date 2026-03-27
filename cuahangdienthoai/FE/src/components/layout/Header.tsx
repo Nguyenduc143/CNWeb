@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 import '../../assets/Header.css';
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { cartItemCount } = useCart();
 
   return (
     <header className="header">
@@ -63,11 +65,11 @@ const Header: React.FC = () => {
                   <span className="action-text">Đăng nhập</span>
                 </Link>
               )}
-              <a href="/cart" className="action-item">
+              <Link to="/cart" className="action-item">
                 <span className="action-icon"><ion-icon name="cart-outline"></ion-icon></span>
                 <span className="action-text">Giỏ hàng</span>
-                <span className="cart-badge">0</span>
-              </a>
+                {cartItemCount > 0 && <span className="cart-badge">{cartItemCount}</span>}
+              </Link>
               <button
                 className="mobile-menu-btn"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

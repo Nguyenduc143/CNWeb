@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ui/ProductCard';
-import { Product } from '../data/types';
+import catalogApi from '../api/catalogApi';
 import '../assets/ProductListPage.css';
 
 interface ProductListPageProps {
   title: string;
   icon: string;
-  products: Product[];
+  brandId: number;
 }
 
-const ProductListPage: React.FC<ProductListPageProps> = ({ title, icon, products }) => {
+const ProductListPage: React.FC<ProductListPageProps> = ({ title, icon, brandId }) => {
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    catalogApi.getProducts({ brandId, pageSize: 20 })
+      .then((res: any) => setProducts(res.data?.products || res.products || []))
+      .catch(console.error);
+  }, [brandId]);
+
   return (
     <div className="product-list-page">
       <div className="container">
@@ -24,9 +32,13 @@ const ProductListPage: React.FC<ProductListPageProps> = ({ title, icon, products
         <h1 className="page-title">{icon} {title}</h1>
 
         <div className="page-grid">
-          {products.map((p) => (
-            <ProductCard key={p.ProductId} product={p} />
-          ))}
+          {products.length > 0 ? (
+            products.map((p) => (
+              <ProductCard key={p.ProductId} product={p} />
+            ))
+          ) : (
+            <p style={{ marginTop: 20 }}>Đang cập nhật sản phẩm cho hãng này...</p>
+          )}
         </div>
       </div>
     </div>
@@ -34,4 +46,3 @@ const ProductListPage: React.FC<ProductListPageProps> = ({ title, icon, products
 };
 
 export default ProductListPage;
-

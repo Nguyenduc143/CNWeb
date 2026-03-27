@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
-import { flashSaleProducts } from '../../data/products';
+import catalogApi from '../../api/catalogApi';
 import '../../assets/FlashSale.css';
 
 const getTimeLeft = () => {
@@ -16,9 +16,16 @@ const getTimeLeft = () => {
 
 const FlashSale: React.FC = () => {
   const [time, setTime] = useState(getTimeLeft());
+  const [flashSaleProducts, setFlashSaleProducts] = useState<any[]>([]);
 
   useEffect(() => {
     const t = setInterval(() => setTime(getTimeLeft()), 1000);
+    
+    // Fetch 4 sản phẩm bất kỳ làm hiển thị giả lập Flash Sale
+    catalogApi.getProducts({ pageSize: 4 })
+      .then((res: any) => setFlashSaleProducts(res.data?.products || res.products || []))
+      .catch(console.error);
+
     return () => clearInterval(t);
   }, []);
 

@@ -43,6 +43,7 @@ export interface Product {
   CreatedAt: string;
   UpdatedAt?: string;
   // Joined fields (populated by API/query)
+  Image1?: string;
   Images?: ProductImage[];
   CategoryName?: string;
   BrandName?: string;
