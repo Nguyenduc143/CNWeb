@@ -1,0 +1,394 @@
+/* ════════════════════════════════════════
+   AboutPage.css  –  Trang Về Chúng Tôi
+   ════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+.about-page {
+  font-family: 'Inter', sans-serif;
+  color: #111827;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* ──────── SECTION HEADER ──────── */
+.section-header { text-align: center; margin-bottom: 50px; }
+.section-tag {
+  display: inline-block;
+  background: #fdf2f8;
+  color: #be123c;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+.section-header h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+}
+
+/* ──────── HERO ──────── */
+.about-hero {
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #1e1b4b 0%, #be123c 100%);
+  overflow: hidden;
+}
+.about-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.about-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.15);
+}
+.about-hero-content {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  padding: 80px 20px;
+}
+.about-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+.about-hero-content h1 {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  line-height: 1.2;
+}
+.about-hero-content p {
+  font-size: 18px;
+  max-width: 600px;
+  opacity: 0.9;
+  line-height: 1.7;
+}
+
+/* ──────── STATS BAR ──────── */
+.about-stats-bar {
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 40px 0;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(190,18,60,0.12); }
+.stat-icon {
+  font-size: 32px;
+  color: #be123c;
+  display: flex;
+}
+.stat-value { font-size: 32px; font-weight: 800; color: #111827; }
+.stat-label { font-size: 14px; color: #6b7280; }
+
+/* ──────── SỨ MỆNH ──────── */
+.about-mission {
+  padding: 80px 0;
+  background: #f9fafb;
+}
+.mission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.mission-text .section-tag { margin-bottom: 14px; }
+.mission-text h2 { font-size: 32px; font-weight: 800; margin-bottom: 20px; }
+.mission-text p { color: #4b5563; line-height: 1.8; margin-bottom: 16px; }
+.mission-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.value-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff1f2;
+  color: #be123c;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #fecdd3;
+}
+.mission-visual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.visual-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 20px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  transition: transform 0.2s;
+  cursor: default;
+}
+.visual-card:hover { transform: translateY(-4px); }
+.visual-card ion-icon { font-size: 36px; }
+.v1 { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+.v2 { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+.v3 { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #3730a3; }
+.v4 { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #9d174d; }
+
+/* ──────── CAM KẾT ──────── */
+.about-commitments { padding: 80px 0; background: #fff; }
+.commitments-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.commitment-card {
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid #f3f4f6;
+  background: #fff;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.commitment-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(190,18,60,0.1);
+  border-color: #fecdd3;
+}
+.commitment-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 26px;
+  margin-bottom: 18px;
+}
+.commitment-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.commitment-card p { font-size: 14px; color: #6b7280; line-height: 1.7; }
+
+/* ──────── TIMELINE ──────── */
+.about-timeline { padding: 80px 0; background: #f9fafb; }
+.timeline {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #be123c, #1e1b4b);
+  transform: translateX(-50%);
+}
+.timeline-item {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: calc(50% + 30px);
+  margin-bottom: 40px;
+  position: relative;
+}
+.timeline-item.right {
+  justify-content: flex-start;
+  padding-right: 0;
+  padding-left: calc(50% + 30px);
+}
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: 14px; height: 14px;
+  background: #be123c;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 3px rgba(190,18,60,0.2);
+  z-index: 1;
+}
+.timeline-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  max-width: 320px;
+  width: 100%;
+}
+.timeline-year {
+  display: inline-block;
+  font-size: 22px;
+  font-weight: 800;
+  color: #be123c;
+  margin-bottom: 8px;
+}
+.timeline-card p { font-size: 14px; color: #4b5563; line-height: 1.7; margin: 0; }
+
+/* ──────── TEAM ──────── */
+.about-team { padding: 80px 0; background: #fff; }
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.team-card {
+  text-align: center;
+  padding: 32px 20px;
+  border-radius: 16px;
+  border: 1px solid #f3f4f6;
+  background: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.team-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+.team-avatar {
+  font-size: 56px;
+  margin-bottom: 16px;
+  display: block;
+  line-height: 1;
+}
+.team-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.team-role {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #be123c;
+  background: #fff1f2;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+.team-card p { font-size: 13px; color: #6b7280; line-height: 1.7; }
+
+/* ──────── CHI NHÁNH ──────── */
+.about-branches { padding: 80px 0; background: #f9fafb; }
+.branches-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.branch-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+.branch-card:hover { transform: translateY(-4px); }
+.branch-icon {
+  flex-shrink: 0;
+  width: 52px; height: 52px;
+  background: #fff1f2;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #be123c;
+}
+.branch-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+.branch-info p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+.branch-info a { color: #be123c; font-weight: 600; text-decoration: none; }
+.branch-info a:hover { text-decoration: underline; }
+
+/* ──────── CTA ──────── */
+.about-cta { padding: 80px 0; background: #fff; }
+.cta-box {
+  background: linear-gradient(135deg, #1e1b4b 0%, #be123c 100%);
+  border-radius: 20px;
+  padding: 60px 40px;
+  text-align: center;
+  color: #fff;
+}
+.cta-box ion-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+.cta-box h2 { font-size: 32px; font-weight: 800; margin-bottom: 14px; }
+.cta-box p { font-size: 17px; opacity: 0.85; margin-bottom: 32px; }
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: #be123c;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* ──────── RESPONSIVE ──────── */
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .mission-grid { grid-template-columns: 1fr; }
+  .commitments-grid { grid-template-columns: repeat(2, 1fr); }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-hero-content h1 { font-size: 34px; }
+  .timeline::before { left: 16px; }
+  .timeline-item, .timeline-item.right { padding: 0 0 0 50px; justify-content: flex-start; }
+  .timeline-dot { left: 16px; }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .commitments-grid { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: 1fr 1fr; }
+  .branches-grid { grid-template-columns: 1fr; }
+  .about-hero-content h1 { font-size: 28px; }
+  .mission-visual { grid-template-columns: 1fr 1fr; }
+}

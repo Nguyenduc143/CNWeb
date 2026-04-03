@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import Header from './components/layout/Header';
-import CategoryBar from './components/layout/CategoryBar';
 import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
@@ -19,6 +18,7 @@ import ProductManager from './pages/admin/ProductManager';
 import CategoryManager from './pages/admin/CategoryManager';
 import OrderManager from './pages/admin/OrderManager';
 import UserManager from './pages/admin/UserManager';
+import AboutPage from './pages/AboutPage';
 import { useScrollTop } from './hooks/useScrollTop';
 import './index.css';
 
@@ -28,7 +28,6 @@ const StorefrontLayout = () => {
   return (
     <>
       <Header />
-      <CategoryBar />
       <Outlet />
       <Footer />
     </>
@@ -46,18 +45,25 @@ function App() {
             <Route index element={<HomePage />} />
           <Route
             path="/iphone"
-            element={<ProductListPage title="iPhone" icon="🍎" brandId={1} />}
+            element={<ProductListPage title="iPhone" icon={<ion-icon name="logo-apple"></ion-icon>} brandId={1} />}
+          />
+          <Route
+            path="/flash-sale"
+            element={<ProductListPage title="Flash Sale Hôm Nay" icon={<ion-icon name="flash-outline"></ion-icon>} />}
           />
           <Route
             path="/samsung"
-            element={<ProductListPage title="Samsung Galaxy" icon="📟" brandId={2} />}
+            element={<ProductListPage title="Samsung Galaxy" icon={<ion-icon name="phone-portrait-outline"></ion-icon>} brandId={2} />}
           />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
-            <Route path="san-pham/:slug" element={<ProductDetailPage />} />
+            <Route path="/danh-muc/:id" element={<ProductListPage title="Danh Mục" icon={<ion-icon name="grid-outline"></ion-icon>} />} />
+            <Route path="/tim-kiem" element={<ProductListPage title="Tìm Kiếm" icon={<ion-icon name="search-outline"></ion-icon>} />} />
+            <Route path="/san-pham/:slug" element={<ProductDetailPage />} />
+            <Route path="/gioi-thieu" element={<AboutPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
 

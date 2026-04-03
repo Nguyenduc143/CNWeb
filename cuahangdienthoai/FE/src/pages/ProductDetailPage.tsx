@@ -91,12 +91,30 @@ const ProductDetailPage: React.FC = () => {
              {/* Biến thể */}
              {(product.RamGB || product.RomGB || product.Color) && (
              <div className="detail-variants">
-                <h3>Cấu hình phần cứng</h3>
-                <div className="variant-badges">
-                  {product.RamGB && <span className="variant-badge">RAM {product.RamGB}GB</span>}
-                  {product.RomGB && <span className="variant-badge">ROM {product.RomGB}GB</span>}
-                  {product.Color && <span className="variant-badge">Màu: {product.Color}</span>}
-                </div>
+                {product.RamGB && (
+                  <div className="variant-group">
+                    <h3>Chọn dung lượng RAM</h3>
+                    <div className="variant-badges">
+                      <button type="button" className="variant-badge active">{product.RamGB}GB</button>
+                    </div>
+                  </div>
+                )}
+                {product.RomGB && (
+                  <div className="variant-group">
+                    <h3>Chọn dung lượng lưu trữ</h3>
+                    <div className="variant-badges">
+                      <button type="button" className="variant-badge active">{product.RomGB}GB</button>
+                    </div>
+                  </div>
+                )}
+                {product.Color && (
+                  <div className="variant-group">
+                    <h3>Chọn màu sắc</h3>
+                    <div className="variant-badges">
+                      <button type="button" className="variant-badge active">{product.Color}</button>
+                    </div>
+                  </div>
+                )}
              </div>
              )}
 

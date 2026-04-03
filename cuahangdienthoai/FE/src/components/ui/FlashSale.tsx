@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import catalogApi from '../../api/catalogApi';
 import '../../assets/FlashSale.css';
@@ -64,7 +65,7 @@ const FlashSale: React.FC = () => {
               </div>
             </div>
           </div>
-          <a href="/flash-sale" className="view-all-btn">Xem tất cả →</a>
+          <Link to="/flash-sale" className="view-all-btn">Xem tất cả →</Link>
         </div>
 
         <div className="product-grid">

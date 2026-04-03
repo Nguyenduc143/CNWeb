@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import HeroBanner from '../components/ui/HeroBanner';
 import FlashSale from '../components/ui/FlashSale';
 import ProductSection from '../components/ui/ProductSection';
-import RepairSection from '../components/ui/RepairSection';
 import catalogApi from '../api/catalogApi';
 import '../assets/HomePage.css';
 
@@ -30,7 +29,7 @@ const HomePage: React.FC = () => {
 
       <ProductSection
         title="iPhone"
-        icon="🍎"
+        icon={<ion-icon name="logo-apple"></ion-icon>}
         products={iphones}
         viewAllLink="/iphone"
         subCategories={[
@@ -40,7 +39,7 @@ const HomePage: React.FC = () => {
 
       <ProductSection
         title="Samsung Galaxy"
-        icon="📟"
+        icon={<ion-icon name="phone-portrait-outline"></ion-icon>}
         products={samsungs}
         viewAllLink="/samsung"
         subCategories={[
@@ -48,8 +47,6 @@ const HomePage: React.FC = () => {
           { label: 'Galaxy Z Fold/Flip', href: '/samsung' },
         ]}
       />
-
-      <RepairSection />
 
       {/* About section */}
       <section className="about-section">
@@ -81,10 +78,10 @@ const HomePage: React.FC = () => {
             </div>
             <div className="about-features">
               {[
-                { icon: '✅', title: 'Sản phẩm chính hãng', desc: '100% hàng chính hãng, có tem bảo hành' },
-                { icon: '💰', title: 'Giá cả cạnh tranh', desc: 'Cam kết giá tốt nhất thị trường' },
-                { icon: '🚚', title: 'Miễn phí vận chuyển', desc: 'Ship toàn quốc, nhận hàng nhanh' },
-                { icon: '🔧', title: 'Sửa chữa chuyên nghiệp', desc: 'Kỹ thuật viên giàu kinh nghiệm' },
+                { icon: <ion-icon name="checkmark-circle-outline"></ion-icon>, title: 'Sản phẩm chính hãng', desc: '100% hàng chính hãng, có tem bảo hành' },
+                { icon: <ion-icon name="cash-outline"></ion-icon>, title: 'Giá cả cạnh tranh', desc: 'Cam kết giá tốt nhất thị trường' },
+                { icon: <ion-icon name="car-outline"></ion-icon>, title: 'Miễn phí vận chuyển', desc: 'Ship toàn quốc, nhận hàng nhanh' },
+                { icon: <ion-icon name="build-outline"></ion-icon>, title: 'Sửa chữa chuyên nghiệp', desc: 'Kỹ thuật viên giàu kinh nghiệm' },
               ].map((f) => (
                 <div key={f.title} className="feature-card">
                   <span className="feature-icon">{f.icon}</span>

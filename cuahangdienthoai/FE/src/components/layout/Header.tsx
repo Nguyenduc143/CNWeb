@@ -1,12 +1,68 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import catalogApi from '../../api/catalogApi';
 import '../../assets/Header.css';
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { cartItemCount } = useCart();
+  const [categories, setCategories] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (!val.trim()) {
+       setSearchResults([]);
+       setIsSearching(false);
+       return;
+    }
+
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(() => {
+       catalogApi.getProducts({ keyword: val, pageSize: 5 }).then((res: any) => {
+           setSearchResults(res.data?.products || res.products || []);
+           setIsSearching(false);
+       }).catch((err: any) => {
+           console.error(err);
+           setIsSearching(false);
+       });
+    }, 500);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSearchResults([]); // close dropdown
+      navigate(`/tim-kiem?keyword=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchResults([]);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    catalogApi.getCategories()
+      .then((res: any) => setCategories(res.data?.categories || res.categories || []))
+      .catch(console.error);
+  }, []);
 
   return (
     <header className="header">
@@ -36,16 +92,41 @@ const Header: React.FC = () => {
             </div>
 
             {/* Search */}
-            <div className="header-search">
-              <div className="search-box">
+            <div className="header-search" ref={searchRef}>
+              <form className="search-box" onSubmit={handleSearch}>
                 <input
                   type="text"
                   placeholder="Tìm kiếm điện thoại, phụ kiện..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchInput}
+                  onFocus={handleSearchInput}
                 />
-                <button className="search-btn"><ion-icon name="search-outline"></ion-icon></button>
-              </div>
+                <button type="submit" className="search-btn"><ion-icon name="search-outline"></ion-icon></button>
+              </form>
+              
+              {/* Dropdown Suggestions */}
+              {searchQuery.trim() && (searchResults.length > 0 || isSearching) && (
+                <div className="search-suggestions">
+                   {isSearching ? (
+                     <div className="suggestion-item">Đang tìm...</div>
+                   ) : (
+                     searchResults.map(p => (
+                       <Link 
+                         key={p.ProductId} 
+                         to={`/san-pham/${p.Slug}`} 
+                         className="suggestion-item" 
+                         onClick={() => { setSearchResults([]); setSearchQuery(''); }}
+                       >
+                          <img src={p.Image1} alt={p.Name} />
+                          <div className="suggestion-info">
+                             <div className="suggestion-name">{p.Name}</div>
+                             <div className="suggestion-price">{p.PriceSell.toLocaleString('vi-VN')} ₫</div>
+                          </div>
+                       </Link>
+                     ))
+                   )}
+                </div>
+              )}
             </div>
 
             {/* Actions */}
@@ -85,39 +166,21 @@ const Header: React.FC = () => {
       <nav className={`header-nav ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="container">
           <ul className="nav-list">
-            <li className="nav-item has-dropdown">
-              <Link to="/dien-thoai"><ion-icon name="phone-portrait-outline"></ion-icon> Điện Thoại</Link>
-              <ul className="dropdown">
-                <li><Link to="/iphone">iPhone</Link></li>
-                <li><Link to="/samsung">Samsung</Link></li>
-                <li><Link to="/oppo">Oppo</Link></li>
-                <li><Link to="/xiaomi">Xiaomi</Link></li>
-              </ul>
-            </li>
-            <li className="nav-item has-dropdown">
-              <Link to="/phu-kien"><ion-icon name="headset-outline"></ion-icon> Phụ Kiện</Link>
-              <ul className="dropdown">
-                <li><Link to="/tai-nghe">Tai nghe</Link></li>
-                <li><Link to="/loa">Loa Bluetooth</Link></li>
-                <li><Link to="/op-lung">Ốp lưng</Link></li>
-                <li><Link to="/sac">Sạc &amp; cáp</Link></li>
-              </ul>
-            </li>
-            <li className="nav-item has-dropdown">
-              <Link to="/sua-chua"><ion-icon name="construct-outline"></ion-icon> Sửa Chữa</Link>
-              <ul className="dropdown">
-                <li><Link to="/sua-iphone">Sửa iPhone</Link></li>
-                <li><Link to="/sua-samsung">Sửa Samsung</Link></li>
-                <li><Link to="/thay-man-hinh">Thay màn hình</Link></li>
-                <li><Link to="/thay-pin">Thay pin</Link></li>
-              </ul>
-            </li>
             <li className="nav-item">
-              <Link to="/tablet"><ion-icon name="tablet-portrait-outline"></ion-icon> Tablet</Link>
+              <Link to="/"><ion-icon name="home-outline"></ion-icon> Trang Chủ</Link>
             </li>
-            <li className="nav-item">
-              <Link to="/tra-gop"><ion-icon name="card-outline"></ion-icon> Trả Góp</Link>
+            <li className="nav-item has-dropdown">
+              <Link to="#"><ion-icon name="grid-outline"></ion-icon> Danh Mục</Link>
+              <ul className="dropdown">
+                {categories.map((c) => (
+                  <li key={c.CategoryId}>
+                    <Link to={`/danh-muc/${c.CategoryId}`}>{c.Name}</Link>
+                  </li>
+                ))}
+              </ul>
             </li>
+
+
             <li className="nav-item">
               <Link to="/tin-tuc"><ion-icon name="newspaper-outline"></ion-icon> Tin Tức</Link>
             </li>

@@ -34,7 +34,7 @@ const ProductManager: React.FC = () => {
   const handleEdit = (record: any) => {
     setEditingId(record.ProductId);
     form.setFieldsValue({
-      name: record.ProductName,
+      name: record.Name,
       priceImport: record.PriceImport,
       priceSell: record.PriceSell,
       stock: record.Stock,
@@ -76,8 +76,8 @@ const ProductManager: React.FC = () => {
   const columns = [
     {
       title: 'Tên Sản Phẩm',
-      dataIndex: 'ProductName',
-      key: 'ProductName',
+      dataIndex: 'Name',
+      key: 'Name',
       render: (text: string, record: any) => (
         <Space>
           {record.Image1 && <img src={record.Image1} alt="thumb" style={{width: 30, height: 30, objectFit: 'cover'}}/>}

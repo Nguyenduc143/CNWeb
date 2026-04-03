@@ -1,23 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ui/ProductCard';
 import catalogApi from '../api/catalogApi';
 import '../assets/ProductListPage.css';
 
 interface ProductListPageProps {
   title: string;
-  icon: string;
-  brandId: number;
+  icon: React.ReactNode;
+  brandId?: number;
 }
 
-const ProductListPage: React.FC<ProductListPageProps> = ({ title, icon, brandId }) => {
+const ProductListPage: React.FC<ProductListPageProps> = ({ title: propTitle, icon, brandId }) => {
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const keyword = searchParams.get('keyword') || undefined;
+  const categoryId = id ? parseInt(id, 10) : undefined;
+  
   const [products, setProducts] = useState<any[]>([]);
+  const [title, setTitle] = useState(propTitle);
 
   useEffect(() => {
-    catalogApi.getProducts({ brandId, pageSize: 20 })
+    if (keyword) {
+      setTitle(`Kết quả tìm kiếm cho: "${keyword}"`);
+    } else if (categoryId) {
+      catalogApi.getCategories().then((res: any) => {
+         const cats = res.data?.categories || res.categories || [];
+         const found = cats.find((c:any) => c.CategoryId === categoryId);
+         if (found) setTitle(found.Name);
+      }).catch(console.error);
+    } else {
+      setTitle(propTitle);
+    }
+  }, [categoryId, propTitle, keyword]);
+
+  useEffect(() => {
+    catalogApi.getProducts({ brandId, categoryId, keyword, pageSize: 20 })
       .then((res: any) => setProducts(res.data?.products || res.products || []))
       .catch(console.error);
-  }, [brandId]);
+  }, [brandId, categoryId, keyword]);
 
   return (
     <div className="product-list-page">
@@ -37,7 +57,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({ title, icon, brandId 
               <ProductCard key={p.ProductId} product={p} />
             ))
           ) : (
-            <p style={{ marginTop: 20 }}>Đang cập nhật sản phẩm cho hãng này...</p>
+            <p style={{ marginTop: 20 }}>Không tìm thấy sản phẩm nào phù hợp.</p>
           )}
         </div>
       </div>

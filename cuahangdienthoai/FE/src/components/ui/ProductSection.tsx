@@ -5,7 +5,7 @@ import '../../assets/ProductSection.css';
 
 interface ProductSectionProps {
   title: string;
-  icon: string;
+  icon: React.ReactNode;
   products: Product[];
   viewAllLink?: string;
   subCategories?: { label: string; href: string }[];

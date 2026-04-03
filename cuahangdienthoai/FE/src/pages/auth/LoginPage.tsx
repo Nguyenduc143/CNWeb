@@ -16,12 +16,8 @@ const LoginPage: React.FC = () => {
       localStorage.setItem('access_token', res.token);
       alert('Đăng nhập thành công! Xin chào ' + (res.user?.fullName || res.user?.username));
       
-      // Auto routing based on Role Permission
-      if (res.user?.role === 'Admin') {
-        window.location.href = '/admin';
-      } else {
-        window.location.href = '/';
-      }
+      // Luôn chuyển về trang chủ (cửa hàng) sau khi đăng nhập thành công
+      window.location.href = '/';
     } catch (error: any) {
       alert(typeof error === 'string' ? error : error?.message || 'Đăng nhập thất bại.');
     }

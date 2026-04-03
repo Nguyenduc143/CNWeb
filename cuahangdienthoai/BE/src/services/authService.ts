@@ -8,7 +8,7 @@ export const authService = {
     
     // Gọi Stored Procedure Đăng nhập gốc
     const userResult = await pool.request()
-        .input('LoginId', sql.NVarChar, loginId)
+        .input('Email', sql.NVarChar, loginId)
         .execute('sp_LoginUser');
 
     if (userResult.recordset.length === 0) {
