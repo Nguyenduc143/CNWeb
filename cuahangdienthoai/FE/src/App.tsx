@@ -6,6 +6,7 @@ import CategoryBar from './components/layout/CategoryBar';
 import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -56,6 +57,7 @@ function App() {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
+            <Route path="san-pham/:slug" element={<ProductDetailPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
 

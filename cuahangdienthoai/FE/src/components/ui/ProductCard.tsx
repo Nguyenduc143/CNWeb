@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Product } from '../../data/types';
 import { useCart } from '../../context/CartContext';
 import '../../assets/ProductCard.css';
@@ -29,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const showNew = isNew(product.CreatedAt);
 
   return (
-    <div className="product-card">
+    <Link to={`/san-pham/${product.Slug}`} className="product-card" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
       <div className="product-image-wrap">
         {showNew && <span className="product-badge badge-new"><ion-icon name="sparkles"></ion-icon> MỚI</span>}
         {discount > 0 && (
@@ -83,7 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
