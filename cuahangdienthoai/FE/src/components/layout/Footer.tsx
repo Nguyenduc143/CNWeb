@@ -52,10 +52,10 @@ const Footer: React.FC = () => {
                 Hơn 10 năm phục vụ hàng chục nghìn khách hàng.
               </p>
               <div className="footer-contact">
-                <p><ion-icon name="call-outline"></ion-icon> Hotline: <strong>1800 6868</strong></p>
-                <p><ion-icon name="location-outline"></ion-icon> 94 Thái Hà, Đống Đa, Hà Nội</p>
-                <p><ion-icon name="location-outline"></ion-icon> 398 Cầu Giấy, Cầu Giấy, Hà Nội</p>
-                <p><ion-icon name="mail-outline"></ion-icon> info@cuahangdidong.vn</p>
+                <p><ion-icon name="call-outline"></ion-icon> Hotline: <strong>0967688908</strong></p>
+                <p><ion-icon name="location-outline"></ion-icon> Mỹ Hào, Hưng Yên</p>
+                <p><ion-icon name="location-outline"></ion-icon> Yên Mỹ, Hưng Yên</p>
+                <p><ion-icon name="mail-outline"></ion-icon> nguyenduc9adt19@gmail.com</p>
               </div>
             </div>
 
@@ -102,7 +102,7 @@ const Footer: React.FC = () => {
       {/* Bottom bar */}
       <div className="footer-bottom">
         <div className="container">
-          <p>© 2025 Cửa Hàng Di Động. Tất cả quyền được bảo lưu.</p>
+          <p>© 2026 Cửa Hàng Di Động. Tất cả quyền được bảo lưu.</p>
           <div className="footer-payments">
             <span className="payment-icon"><ion-icon name="card-outline"></ion-icon></span>
             <span className="payment-icon"><ion-icon name="business-outline"></ion-icon></span>

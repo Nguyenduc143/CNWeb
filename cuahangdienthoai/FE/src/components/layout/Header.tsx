@@ -70,8 +70,8 @@ const Header: React.FC = () => {
       <div className="header-topbar">
         <div className="container">
           <div className="topbar-left">
-            <span><ion-icon name="call-outline"></ion-icon> Hotline: <strong>1800 6868</strong></span>
-            <span><ion-icon name="location-outline"></ion-icon> 94 Thái Hà &amp; 398 Cầu Giấy, Hà Nội</span>
+            <span><ion-icon name="call-outline"></ion-icon> Hotline: <strong>0967688908</strong></span>
+            <span><ion-icon name="location-outline"></ion-icon> Mỹ Hào, Hưng Yên &amp; Yên Mỹ, Hưng Yên</span>
           </div>
           <div className="topbar-right">
             <span><ion-icon name="bus-outline"></ion-icon> Miễn phí ship toàn quốc</span>
