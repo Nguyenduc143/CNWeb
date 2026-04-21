@@ -80,5 +80,52 @@ export const authService = {
 
     if (result.recordset.length === 0) return null;
     return result.recordset[0];
+  },
+
+  resetPassword: async (email: string, phone: string, newPasswordRaw: string) => {
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPasswordRaw, salt);
+
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('Email', sql.NVarChar, email)
+      .input('PhoneNumber', sql.NVarChar, phone)
+      .input('NewPasswordHash', sql.NVarChar, passwordHash)
+      .execute('sp_ResetPassword');
+
+    const status = result.recordset[0];
+    if (status.Success === 0) {
+      throw new Error(status.Message);
+    }
+    return status;
+  },
+
+  changePassword: async (userId: string, oldPasswordRaw: string, newPasswordRaw: string) => {
+    const pool = await getConnection();
+    
+    const userResult = await pool.request()
+      .input('UserId', sql.UniqueIdentifier, userId)
+      .execute('sp_GetUserPassword');
+
+    if (userResult.recordset.length === 0) {
+      throw new Error('USER_NOT_FOUND');
+    }
+
+    const currentHash = userResult.recordset[0].PasswordHash;
+    const isMatch = await bcrypt.compare(oldPasswordRaw, currentHash);
+    
+    if (!isMatch) {
+      throw new Error('INCORRECT_OLD_PASSWORD');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const newHash = await bcrypt.hash(newPasswordRaw, salt);
+
+    await pool.request()
+      .input('UserId', sql.UniqueIdentifier, userId)
+      .input('NewPasswordHash', sql.NVarChar, newHash)
+      .execute('sp_UpdatePasswordByUserId');
+
+    return true;
   }
 };

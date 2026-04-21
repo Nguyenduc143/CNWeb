@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import authApi from '../../api/authApi';
 import '../../assets/Auth.css';
@@ -6,14 +6,33 @@ import '../../assets/Auth.css';
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('remembered_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res: any = await authApi.login({ email, password });
+      // Xóa triệt để các phiên bản token cũ trước khi ghi mới
+      localStorage.removeItem('access_token');
+      sessionStorage.removeItem('access_token');
+
       // Đã sửa lại thành res.token theo chuẩn Backend mới
-      localStorage.setItem('access_token', res.token);
+      if (rememberMe) {
+        localStorage.setItem('access_token', res.token);
+        localStorage.setItem('remembered_email', email);
+      } else {
+        sessionStorage.setItem('access_token', res.token);
+        localStorage.removeItem('remembered_email');
+      }
       alert('Đăng nhập thành công! Xin chào ' + (res.user?.fullName || res.user?.username));
       
       // Luôn chuyển về trang chủ (cửa hàng) sau khi đăng nhập thành công
@@ -64,10 +83,14 @@ const LoginPage: React.FC = () => {
             
             <div className="auth-options">
               <label className="remember-me">
-                <input type="checkbox" />
+                <input 
+                  type="checkbox" 
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)} 
+                />
                 Ghi nhớ tôi
               </label>
-              <Link to="#" className="forgot-password">Quên mật khẩu?</Link>
+              <Link to="/forgot-password" className="forgot-password">Quên mật khẩu?</Link>
             </div>
           </div>
           

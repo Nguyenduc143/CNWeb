@@ -7,7 +7,7 @@ const catalogApi = {
   getBrands: () => {
     return axiosClient.get('/brands');
   },
-  getProducts: (params?: { page?: number, pageSize?: number, keyword?: string, categoryId?: number, brandId?: number }) => {
+  getProducts: (params?: any) => {
     return axiosClient.get('/products', { params });
   },
   getProductBySlug: (slug: string) => {

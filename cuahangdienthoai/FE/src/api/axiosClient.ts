@@ -10,7 +10,7 @@ const axiosClient = axios.create({
 
 // Interceptor cho Request: Tự động đính kèm Token
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -29,6 +29,7 @@ axiosClient.interceptors.response.use(
     // Nơi bạn có thể log out user nếu API báo lỗi 401 Unauthorized
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
+      sessionStorage.removeItem('access_token');
       // window.location.href = '/login';
     }
     return Promise.reject(error.response?.data || error.message);

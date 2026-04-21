@@ -14,7 +14,7 @@ export const catalogService = {
     return result.recordset;
   },
 
-  getProducts: async ({ page = 1, pageSize = 12, keyword = '', categoryId = null, brandId = null }: any) => {
+  getProducts: async ({ page = 1, pageSize = 12, keyword = '', categoryId = null, brandId = null, minPrice = null, maxPrice = null, sortBy = null }: any) => {
     const pool = await getConnection();
     const result = await pool.request()
         .input('Page', sql.Int, page)
@@ -22,6 +22,9 @@ export const catalogService = {
         .input('Keyword', sql.NVarChar, keyword ? keyword : null)
         .input('CategoryId', sql.Int, categoryId ? parseInt(categoryId) : null)
         .input('BrandId', sql.Int, brandId ? parseInt(brandId) : null)
+        .input('MinPrice', sql.Decimal(18,2), minPrice ? parseFloat(minPrice) : null)
+        .input('MaxPrice', sql.Decimal(18,2), maxPrice ? parseFloat(maxPrice) : null)
+        .input('SortMode', sql.NVarChar(50), sortBy ? sortBy : null)
         .execute('sp_GetProducts');
     
     // TotalCount nằm chung ở dòng đầu tiên của kết quả trả về

@@ -7,8 +7,10 @@ import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
+import NewsPage from './pages/NewsPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ProfilePage from './pages/user/ProfilePage';
 import CartPage from './pages/checkout/CartPage';
 import CheckoutPage from './pages/checkout/CheckoutPage';
@@ -57,12 +59,14 @@ function App() {
           />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="/danh-muc/:id" element={<ProductListPage title="Danh Mục" icon={<ion-icon name="grid-outline"></ion-icon>} />} />
             <Route path="/tim-kiem" element={<ProductListPage title="Tìm Kiếm" icon={<ion-icon name="search-outline"></ion-icon>} />} />
             <Route path="/san-pham/:slug" element={<ProductDetailPage />} />
+            <Route path="/tin-tuc" element={<NewsPage />} />
             <Route path="/gioi-thieu" element={<AboutPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>

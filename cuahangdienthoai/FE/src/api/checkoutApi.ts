@@ -18,6 +18,9 @@ const checkoutApi = {
   },
   getOrderDetails: (id: string) => {
     return axiosClient.get(`/user/orders/history/${id}`);
+  },
+  cancelOrder: (id: string) => {
+    return axiosClient.put(`/user/orders/${id}/cancel`);
   }
 };
 

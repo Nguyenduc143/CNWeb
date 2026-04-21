@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { requireAuth } from '../middlewares/authMiddleware';
 import { 
   getAddresses, addAddress, deleteAddress, 
-  checkoutOrder, getOrderHistory, getOrderDetails 
+  checkoutOrder, getOrderHistory, getOrderDetails, cancelOrder
 } from '../controllers/checkoutController';
 
 const router = Router();
@@ -19,5 +19,6 @@ router.delete('/addresses/:id', deleteAddress);
 router.post('/orders', checkoutOrder);
 router.get('/orders/history', getOrderHistory);
 router.get('/orders/history/:id', getOrderDetails);
+router.put('/orders/:id/cancel', cancelOrder);
 
 export default router;

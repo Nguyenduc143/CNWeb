@@ -75,3 +75,17 @@ export const getOrderDetails = async (req: AuthRequest, res: Response) => {
     return error(res, 'Trình truy xuất chi tiết lỗi', 500);
   }
 };
+
+export const cancelOrder = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const id = req.params.id as string;
+    const result = await checkoutService.cancelOrder(userId, id);
+    if (!result || result.Success === 0) {
+      return error(res, result?.Message || 'Không thể hủy đơn hàng', 400);
+    }
+    return success(res, null, result.Message);
+  } catch (err) {
+    return error(res, 'Lỗi cập nhật CSDL hủy đơn', 500);
+  }
+};

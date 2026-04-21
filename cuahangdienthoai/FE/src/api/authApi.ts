@@ -41,6 +41,16 @@ const authApi = {
   updateProfile(data: { fullName: string; phone: string }): Promise<any> {
     const url = '/auth/me';
     return axiosClient.put(url, data);
+  },
+
+  forgotPassword(data: { email: string; phone: string; newPassword: string }): Promise<any> {
+    const url = '/auth/forgot-password';
+    return axiosClient.post(url, data);
+  },
+
+  changePassword(data: { oldPassword: string; newPassword: string }): Promise<any> {
+    const url = '/auth/me/change-password';
+    return axiosClient.put(url, data);
   }
 };
 

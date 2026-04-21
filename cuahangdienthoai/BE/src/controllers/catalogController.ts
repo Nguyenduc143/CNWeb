@@ -25,14 +25,17 @@ export const getBrands = async (req: Request, res: Response) => {
 export const getProducts = async (req: Request, res: Response) => {
   try {
     // Parse query params từ FE (phân trang, search...)
-    const { page, pageSize, keyword, categoryId, brandId } = req.query;
+    const { page, pageSize, keyword, categoryId, brandId, minPrice, maxPrice, sortBy } = req.query;
 
     const data = await catalogService.getProducts({
       page: page ? parseInt(page as string) : 1,
       pageSize: pageSize ? parseInt(pageSize as string) : 12,
       keyword: keyword as string,
       categoryId: categoryId as string,
-      brandId: brandId as string
+      brandId: brandId as string,
+      minPrice: minPrice as string,
+      maxPrice: maxPrice as string,
+      sortBy: sortBy as string
     });
 
     return success(res, { 

@@ -23,6 +23,11 @@ const ProfilePage: React.FC = () => {
   // Orders State
   const [orders, setOrders] = useState<any[]>([]);
 
+  // Security State
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -67,6 +72,19 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleCancelOrder = async (orderId: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Việc hủy không thể hoàn tác!')) {
+      return;
+    }
+    try {
+      await checkoutApi.cancelOrder(orderId);
+      alert('Hủy đơn hàng thành công!');
+      loadOrders(); // Refresh order list
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi hủy đơn hàng');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -101,8 +119,26 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      alert('Nhập lại mật khẩu mới không khớp!');
+      return;
+    }
+    try {
+      await authApi.changePassword({ oldPassword, newPassword });
+      alert('Đổi mật khẩu bảo mật thành công!');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      alert(err.message || 'Lỗi đổi mật khẩu');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('access_token');
+    sessionStorage.removeItem('access_token');
     window.location.href = '/login';
   };
 
@@ -150,6 +186,15 @@ const ProfilePage: React.FC = () => {
               >
                 <ion-icon name="receipt-outline"></ion-icon>
                 <span>Đơn Mua Của Bạn</span>
+              </button>
+            </li>
+            <li>
+              <button 
+                className={`sidebar-link ${activeTab === 'security' ? 'active' : ''}`}
+                onClick={() => setActiveTab('security')}
+              >
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <span>Bảo Mật</span>
               </button>
             </li>
             {role === 'Admin' && (
@@ -271,7 +316,17 @@ const ProfilePage: React.FC = () => {
                       <div className="address-card" key={o.OrderId} style={{ borderLeft: `5px solid ${statusColor}`, marginBottom: 15 }}>
                         <div className="name-phone" style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: 10 }}>
                           <span style={{ fontFamily: 'monospace', fontSize: 16 }}>#{o.OrderId?.split('-')[0].toUpperCase()}</span>
-                          <span style={{ color: statusColor, fontWeight: 'bold' }}>{statusText}</span>
+                          <span style={{ color: statusColor, fontWeight: 'bold' }}>
+                            {statusText}
+                            {o.Status === 0 && (
+                              <button 
+                                onClick={() => handleCancelOrder(o.OrderId)}
+                                style={{ marginLeft: 15, background: 'none', border: '1px solid #ff4d4f', color: '#ff4d4f', padding: '4px 10px', borderRadius: 4, cursor: 'pointer', fontSize: 12, fontWeight: 'bold' }}
+                              >
+                                Hủy Đơn
+                              </button>
+                            )}
+                          </span>
                         </div>
                         <div className="address-details" style={{ marginTop: 15, fontSize: 15, lineHeight: 1.6 }}>
                           <div><strong>Ngày Đặt:</strong> {new Date(o.CreatedAt).toLocaleString('vi-VN')}</div>
@@ -285,6 +340,39 @@ const ProfilePage: React.FC = () => {
                   })}
                 </div>
               )}
+            </>
+          )}
+
+          {activeTab === 'security' && (
+            <>
+              <div className="profile-main-header">
+                <h2>Đổi Mật Khẩu</h2>
+                <p>Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác</p>
+              </div>
+
+              <form className="profile-form" onSubmit={handleChangePassword}>
+                <div className="form-group-row">
+                  <label className="form-label">Mật Khẩu Hiện Tại</label>
+                  <input 
+                    type="password" placeholder="Nhập lại mật khẩu đang dùng" value={oldPassword} 
+                    onChange={(e) => setOldPassword(e.target.value)} required minLength={6} className="form-input" />
+                </div>
+                <div className="form-group-row">
+                  <label className="form-label">Mật Khẩu Mới</label>
+                  <input 
+                    type="password" placeholder="Mật khẩu mới (từ 6 ký tự)" value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} required minLength={6} className="form-input" />
+                </div>
+                <div className="form-group-row">
+                  <label className="form-label">Xác Nhận Mật Khẩu Mới</label>
+                  <input 
+                    type="password" placeholder="Nhập lại mật khẩu mới ở trên" value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} required minLength={6} className="form-input" />
+                </div>
+                <div className="form-actions">
+                  <button type="submit" className="btn-primary">Lưu Mật Khẩu</button>
+                </div>
+              </form>
             </>
           )}
         </main>

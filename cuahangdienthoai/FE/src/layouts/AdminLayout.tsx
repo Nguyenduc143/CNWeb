@@ -26,6 +26,7 @@ const AdminLayout: React.FC = () => {
   const handleMenuClick = (e: { key: string }) => {
     if (e.key === 'logout') {
       localStorage.removeItem('access_token');
+      sessionStorage.removeItem('access_token');
       navigate('/login');
     } else {
       navigate(e.key);

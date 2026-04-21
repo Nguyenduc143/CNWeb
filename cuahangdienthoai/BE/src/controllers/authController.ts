@@ -131,3 +131,50 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
     return error(res, 'Cập nhật thất bại', 500);
   }
 };
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, phone, newPassword } = req.body;
+
+    if (!email || !phone || !newPassword) {
+      return error(res, 'Vui lòng nhập đầy đủ Email, Số điện thoại và Mật khẩu mới', 400);
+    }
+
+    if (newPassword.length < 6) {
+      return error(res, 'Mật khẩu mới phải có ít nhất 6 ký tự', 400);
+    }
+
+    await authService.resetPassword(email, phone, newPassword);
+    
+    return success(res, null, 'Đặt lại mật khẩu thành công');
+  } catch (err: any) {
+    console.error('Forgot password error:', err);
+    return error(res, err.message || 'Lỗi đặt lại mật khẩu', 400);
+  }
+};
+
+export const changePassword = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return error(res, 'Vui lòng đăng nhập', 401);
+    }
+    const { oldPassword, newPassword } = req.body;
+    
+    if (!oldPassword || !newPassword) {
+      return error(res, 'Vui lòng điền đủ mật khẩu cũ và mới', 400);
+    }
+    if (newPassword.length < 6) {
+      return error(res, 'Mật khẩu mới phải tối thiểu 6 ký tự', 400);
+    }
+
+    await authService.changePassword(req.user.id, oldPassword, newPassword);
+    
+    return success(res, null, 'Đổi mật khẩu thành công');
+  } catch (err: any) {
+    console.error('Change password error:', err);
+    if (err.message === 'INCORRECT_OLD_PASSWORD') {
+      return error(res, 'Mật khẩu cũ không chính xác', 400);
+    }
+    return error(res, 'Không thể đổi mật khẩu, vui lòng thử lại', 500);
+  }
+};

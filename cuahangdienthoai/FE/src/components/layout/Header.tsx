@@ -135,7 +135,7 @@ const Header: React.FC = () => {
                 <span className="action-icon"><ion-icon name="call"></ion-icon></span>
                 <span className="action-text">Gọi ngay</span>
               </a>
-              {localStorage.getItem('access_token') ? (
+              {(localStorage.getItem('access_token') || sessionStorage.getItem('access_token')) ? (
                 <Link to="/profile" className="action-item">
                   <span className="action-icon"><ion-icon name="person-circle-outline"></ion-icon></span>
                   <span className="action-text">Hồ sơ</span>

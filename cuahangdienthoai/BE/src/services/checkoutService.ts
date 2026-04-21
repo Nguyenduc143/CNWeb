@@ -74,5 +74,14 @@ export const checkoutService = {
     const orderInfo = recordsets[0][0];
     const items = recordsets[1] || [];
     return { ...orderInfo, Items: items };
+  },
+
+  cancelOrder: async (userId: string, orderId: string) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('OrderId', sql.UniqueIdentifier, orderId)
+      .input('UserId', sql.UniqueIdentifier, userId)
+      .execute('sp_CancelOrder');
+    return result.recordset[0];
   }
 };
