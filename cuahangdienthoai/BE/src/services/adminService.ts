@@ -47,6 +47,33 @@ export const adminService = {
     return true;
   },
 
+  // --- QUẢN LÝ THƯƠNG HIỆU ---
+  getBrands: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().execute('sp_GetThuongHieu');
+    return result.recordset;
+  },
+  createBrand: async (data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+        .input('Ten', sql.NVarChar, data.name)
+        .execute('sp_Admin_CreateBrand');
+    return result.recordset?.[0] || true;
+  },
+  updateBrand: async (id: number, data: any) => {
+    const pool = await getConnection();
+    await pool.request()
+        .input('Id', sql.Int, id)
+        .input('Ten', sql.NVarChar, data.name)
+        .execute('sp_Admin_UpdateBrand');
+    return true;
+  },
+  deleteBrand: async (id: number) => {
+    const pool = await getConnection();
+    await pool.request().input('Id', sql.Int, id).execute('sp_Admin_DeleteBrand');
+    return true;
+  },
+
   // --- QUẢN LÝ ĐƠN HÀNG ---
   getAllOrders: async () => {
     const pool = await getConnection();
@@ -133,6 +160,44 @@ export const adminService = {
   deleteProduct: async (id: string) => {
     const pool = await getConnection();
     await pool.request().input('Id', sql.UniqueIdentifier, id).execute('sp_Admin_DeleteProduct');
+    return true;
+  },
+
+  // --- QUẢN LÝ TIN TỨC ---
+  getAllNews: async () => {
+    const pool = await getConnection();
+    // Re-use current User getter or a specific one, sp_GetTinTuc doesn't have an Admin version, it's fine.
+    const result = await pool.request().execute('sp_GetTinTuc');
+    return result.recordset;
+  },
+  createNews: async (data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+        .input('TieuDe', sql.NVarChar, data.TieuDe)
+        .input('TomTat', sql.NVarChar, data.TomTat)
+        .input('NoiDung', sql.NVarChar, data.NoiDung)
+        .input('HinhThuNho', sql.NVarChar, data.HinhThuNho || null)
+        .input('TrangThai', sql.Bit, data.TrangThai === false ? 0 : 1)
+        .execute('sp_Admin_CreateNews');
+    return result.recordset?.[0] || true;
+  },
+  updateNews: async (id: number, data: any) => {
+    const pool = await getConnection();
+    await pool.request()
+        .input('Id', sql.Int, id)
+        .input('TieuDe', sql.NVarChar, data.TieuDe)
+        .input('TomTat', sql.NVarChar, data.TomTat)
+        .input('NoiDung', sql.NVarChar, data.NoiDung)
+        .input('HinhThuNho', sql.NVarChar, data.HinhThuNho || null)
+        .input('TrangThai', sql.Bit, data.TrangThai === false ? 0 : 1)
+        .execute('sp_Admin_UpdateNews');
+    return true;
+  },
+  deleteNews: async (id: number) => {
+    const pool = await getConnection();
+    await pool.request()
+        .input('Id', sql.Int, id)
+        .execute('sp_Admin_DeleteNews');
     return true;
   }
 };

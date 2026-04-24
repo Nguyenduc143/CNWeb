@@ -8,6 +8,7 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
   LogoutOutlined,
+  ProfileOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
@@ -58,12 +59,22 @@ const AdminLayout: React.FC = () => {
             {
               key: '/admin/categories',
               icon: <TagsOutlined />,
-              label: 'Danh Mục & Hãng',
+              label: 'Quản Lý Danh Mục',
+            },
+            {
+              key: '/admin/brands',
+              icon: <AppstoreOutlined />,
+              label: 'Quản Lý Thương Hiệu',
             },
             {
               key: '/admin/orders',
               icon: <ShoppingCartOutlined />,
               label: 'Quản Lý Đơn Hàng',
+            },
+            {
+              key: '/admin/news',
+              icon: <ProfileOutlined />,
+              label: 'Quản Lý Tin Tức',
             },
             {
               key: '/admin/users',

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Space, Popconfirm, message } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Space, Popconfirm, Select, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import adminApi from '../../api/adminApi';
 
 const ProductManager: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -17,10 +19,16 @@ const ProductManager: React.FC = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res: any = await adminApi.getProducts();
-      setProducts(res.products || []);
+      const [resProd, resCat, resBrand]: any = await Promise.all([
+        adminApi.getProducts(),
+        adminApi.getCategories(),
+        adminApi.getBrands()
+      ]);
+      setProducts(resProd.products || []);
+      setCategories(resCat.categories || []);
+      setBrands(resBrand.brands || []);
     } catch (err: any) {
-      message.error(err.message || 'Lỗi tải danh sách sản phẩm');
+      message.error(err.message || 'Lỗi tải danh mục / sản phẩm');
     }
     setLoading(false);
   };
@@ -35,6 +43,8 @@ const ProductManager: React.FC = () => {
     setEditingId(record.ProductId);
     form.setFieldsValue({
       name: record.Name,
+      categoryId: record.CategoryId || null,
+      brandId: record.BrandId || null,
       priceImport: record.PriceImport,
       priceSell: record.PriceSell,
       stock: record.Stock,
@@ -141,6 +151,25 @@ const ProductManager: React.FC = () => {
           <Form.Item name="name" label="Tên điện thoại" rules={[{ required: true, message: 'Nhập tên sản phẩm' }]}>
             <Input placeholder="Ví dụ: iPhone 15 Pro Max 256GB" />
           </Form.Item>
+
+          <Space style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+            <Form.Item name="categoryId" label="Danh Mục" rules={[{ required: true, message: 'Vui lòng chọnDanh Mục!' }]}>
+              <Select placeholder="Chọn Danh Mục" style={{ width: 180 }}>
+                {categories.map((c: any) => (
+                  <Select.Option key={c.CategoryId} value={c.CategoryId}>{c.Name}</Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item name="brandId" label="Thương Hiệu" rules={[{ required: true, message: 'Vui lòng chọn Hãng!' }]}>
+              <Select placeholder="Chọn Thương Hiệu" style={{ width: 180 }}>
+                {brands.map((b: any) => (
+                  <Select.Option key={b.MaThuongHieu || b.BrandId} value={b.MaThuongHieu || b.BrandId}>
+                    {b.Ten || b.Name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Space>
 
           <Space style={{ display: 'flex', marginBottom: 8 }} align="baseline">
             <Form.Item name="priceImport" label="Giá Nhập">

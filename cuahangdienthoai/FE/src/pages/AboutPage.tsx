@@ -17,7 +17,7 @@ const commitments = [
   { icon: 'refresh-outline', title: 'Đổi Trả Trong 30 Ngày', desc: 'Chính sách đổi trả linh hoạt trong vòng 30 ngày nếu sản phẩm có lỗi từ nhà sản xuất.' },
   { icon: 'headset-outline', title: 'Hỗ Trợ 24/7', desc: 'Đội ngũ chăm sóc khách hàng luôn sẵn sàng hỗ trợ bạn mọi lúc qua hotline và chat.' },
   { icon: 'car-outline', title: 'Miễn Phí Vận Chuyển', desc: 'Giao hàng miễn phí toàn quốc cho đơn hàng từ 500.000đ, nhận hàng trong 1–3 ngày.' },
-  { icon: 'construct-outline', title: 'Bảo Hành Tận Nơi', desc: 'Dịch vụ bảo hành và sửa chữa chuyên nghiệp tại 2 chi nhánh hoặc gửi bưu kiện.' },
+  { icon: 'construct-outline', title: 'Bảo Hành Chính Hãng', desc: 'Chính sách bảo hành 12 tháng chính hãng tại 2 chi nhánh, hỗ trợ gửi bưu kiện toàn quốc.' },
 ];
 
 const AboutPage: React.FC = () => {

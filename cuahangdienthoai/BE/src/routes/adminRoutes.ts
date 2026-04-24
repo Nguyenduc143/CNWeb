@@ -17,6 +17,12 @@ router.post('/categories', adminController.createCategory);
 router.put('/categories/:id', adminController.updateCategory);
 router.delete('/categories/:id', adminController.deleteCategory);
 
+// Nhánh Quản lý Thương Hiệu
+router.get('/brands', adminController.getBrands);
+router.post('/brands', adminController.createBrand);
+router.put('/brands/:id', adminController.updateBrand);
+router.delete('/brands/:id', adminController.deleteBrand);
+
 // Nhánh Quản lý Đơn Hàng
 router.get('/orders', adminController.getAllOrders);
 router.put('/orders/:id/status', adminController.updateOrderStatus);
@@ -31,5 +37,11 @@ router.get('/products', adminController.getAllProducts);
 router.post('/products', adminController.createProduct);
 router.put('/products/:id', adminController.updateProduct);
 router.delete('/products/:id', adminController.deleteProduct);
+
+// Nhánh Quản lý Tin Tức
+router.get('/news', adminController.getAllNews);
+router.post('/news', adminController.createNews);
+router.put('/news/:id', adminController.updateNews);
+router.delete('/news/:id', adminController.deleteNews);
 
 export default router;

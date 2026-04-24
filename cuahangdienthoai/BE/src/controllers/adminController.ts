@@ -39,6 +39,32 @@ export const adminController = {
     } catch (err) { return error(res, 'Không thể xóa do bị ràng buộc', 400); }
   },
 
+  // --- Thương Hiệu ---
+  getBrands: async (req: Request, res: Response) => {
+    try {
+      const brands = await adminService.getBrands();
+      return success(res, { brands }, 'Lấy danh sách thương hiệu');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  createBrand: async (req: Request, res: Response) => {
+    try {
+      const created = await adminService.createBrand(req.body);
+      return success(res, { brand: created }, 'Tạo thương hiệu thành công');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  updateBrand: async (req: Request, res: Response) => {
+    try {
+      await adminService.updateBrand(Number(req.params.id), req.body);
+      return success(res, null, 'Cập nhật thương hiệu thành công');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  deleteBrand: async (req: Request, res: Response) => {
+    try {
+      await adminService.deleteBrand(Number(req.params.id));
+      return success(res, null, 'Xóa thương hiệu thành công');
+    } catch (err) { return error(res, 'Thương hiệu đang có sản phẩm. Không thể xóa', 400); }
+  },
+
   // --- Đơn hàng ---
   getAllOrders: async (req: Request, res: Response) => {
     try {
@@ -120,5 +146,31 @@ export const adminController = {
       console.error(err);
       return error(res, 'Không thể xóa SP vì đang nằm trong khóa ngoại Hóa đơn.', 400);
     }
+  },
+
+  // --- Tin Tức ---
+  getAllNews: async (req: Request, res: Response) => {
+    try {
+      const news = await adminService.getAllNews();
+      return success(res, { news }, 'Tải danh sách bài viết thành công');
+    } catch (err) { return error(res, 'Sự cố máy chủ', 500); }
+  },
+  createNews: async (req: Request, res: Response) => {
+    try {
+      const created = await adminService.createNews(req.body);
+      return success(res, { news: created }, 'Đăng tải bản tin mới thành công');
+    } catch (err) { return error(res, 'Sự cố tạo mới', 500); }
+  },
+  updateNews: async (req: Request, res: Response) => {
+    try {
+      await adminService.updateNews(Number(req.params.id), req.body);
+      return success(res, null, 'Chỉnh sửa bản tin thành công');
+    } catch (err) { return error(res, 'Sự cố cập nhật', 500); }
+  },
+  deleteNews: async (req: Request, res: Response) => {
+    try {
+      await adminService.deleteNews(Number(req.params.id));
+      return success(res, null, 'Xóa bản tin thành công');
+    } catch (err) { return error(res, 'Sự cố xóa dữ liệu', 500); }
   }
 };

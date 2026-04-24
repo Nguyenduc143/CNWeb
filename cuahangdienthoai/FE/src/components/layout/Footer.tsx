@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
             <div className="footer-col footer-about">
               <h3 className="footer-logo-text"><ion-icon name="phone-portrait-outline"></ion-icon> CỬA HÀNG DI ĐỘNG</h3>
               <p>
-                Chuyên cung cấp điện thoại, phụ kiện chính hãng và dịch vụ sửa chữa chuyên nghiệp. 
+                Chuyên cung cấp điện thoại, phụ kiện chính hãng với chất lượng đảm bảo. 
                 Hơn 10 năm phục vụ hàng chục nghìn khách hàng.
               </p>
               <div className="footer-contact">
@@ -72,13 +72,9 @@ const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Services */}
             <div className="footer-col">
               <h4 className="footer-heading">Dịch Vụ</h4>
               <ul className="footer-links">
-                <li><a href="/sua-chua">Sửa chữa điện thoại</a></li>
-                <li><a href="/thay-man-hinh">Thay màn hình</a></li>
-                <li><a href="/thay-pin">Thay pin</a></li>
                 <li><a href="/thu-cu">Thu mua máy cũ</a></li>
                 <li><a href="/tra-gop">Trả góp 0%</a></li>
               </ul>

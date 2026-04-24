@@ -17,6 +17,19 @@ const adminApi = {
   deleteCategory: (id: number) => {
     return axiosClient.delete(`/admin/categories/${id}`);
   },
+  // --- Thương Hiệu ---
+  getBrands: () => {
+    return axiosClient.get('/admin/brands');
+  },
+  createBrand: (data: any) => {
+    return axiosClient.post('/admin/brands', data);
+  },
+  updateBrand: (id: number, data: any) => {
+    return axiosClient.put(`/admin/brands/${id}`, data);
+  },
+  deleteBrand: (id: number) => {
+    return axiosClient.delete(`/admin/brands/${id}`);
+  },
   // --- Đơn Hàng ---
   getOrders: () => {
     return axiosClient.get('/admin/orders');
@@ -46,6 +59,19 @@ const adminApi = {
   },
   deleteProduct: (id: string) => {
     return axiosClient.delete(`/admin/products/${id}`);
+  },
+  // --- Tin Tức ---
+  getNews: () => {
+    return axiosClient.get('/admin/news');
+  },
+  createNews: (data: any) => {
+    return axiosClient.post('/admin/news', data);
+  },
+  updateNews: (id: number, data: any) => {
+    return axiosClient.put(`/admin/news/${id}`, data);
+  },
+  deleteNews: (id: number) => {
+    return axiosClient.delete(`/admin/news/${id}`);
   }
 };
 
