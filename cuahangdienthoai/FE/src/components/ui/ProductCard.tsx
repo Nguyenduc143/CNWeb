@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { message } from 'antd';
 import { Product } from '../../data/types';
 import { useCart } from '../../context/CartContext';
 import '../../assets/ProductCard.css';
@@ -77,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 quantity: 1,
                 image: thumbUrl
               });
-              alert(`Giỏ hàng đã ghi nhận: ${product.Name}`);
+              message.success(`Giỏ hàng đã ghi nhận: ${product.Name}`);
             }}
           >
             <ion-icon name="cart-outline"></ion-icon> Mua

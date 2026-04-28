@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import authApi from '../../api/authApi';
 import checkoutApi from '../../api/checkoutApi';
 import '../../assets/Profile.css';
@@ -78,10 +79,10 @@ const ProfilePage: React.FC = () => {
     }
     try {
       await checkoutApi.cancelOrder(orderId);
-      alert('Hủy đơn hàng thành công!');
-      loadOrders(); // Refresh order list
+      message.success('Hủy đơn hàng thành công!');
+      loadOrders();
     } catch (err: any) {
-      alert(err.message || 'Lỗi khi hủy đơn hàng');
+      message.error(err.message || 'Lỗi khi hủy đơn hàng');
     }
   };
 
@@ -89,9 +90,9 @@ const ProfilePage: React.FC = () => {
     e.preventDefault();
     try {
       await authApi.updateProfile({ fullName, phone });
-      alert('Cập nhật thông tin thành công!');
+      message.success('Cập nhật thông tin thành công!');
     } catch (error: any) {
-      alert(error.message || 'Lỗi cập nhật');
+      message.error(error.message || 'Lỗi cập nhật');
     }
   };
 
@@ -101,10 +102,10 @@ const ProfilePage: React.FC = () => {
       await checkoutApi.addAddress(addrForm);
       setShowAddressModal(false);
       setAddrForm({ fullName: '', phone: '', addressLine: '', ward: '', district: '', province: '', note: '' });
-      loadAddresses(); // Re-fetch
-      alert('Đã thêm địa chỉ thành công');
+      loadAddresses();
+      message.success('Đã thêm địa chỉ thành công');
     } catch (err: any) {
-      alert(err.message || 'Lỗi thêm địa chỉ');
+      message.error(err.message || 'Lỗi thêm địa chỉ');
     }
   };
 
@@ -114,7 +115,7 @@ const ProfilePage: React.FC = () => {
         await checkoutApi.deleteAddress(id);
         loadAddresses();
       } catch (err) {
-        alert('Lỗi xóa địa chỉ');
+        message.error('Lỗi xóa địa chỉ');
       }
     }
   };
@@ -122,17 +123,17 @@ const ProfilePage: React.FC = () => {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      alert('Nhập lại mật khẩu mới không khớp!');
+      message.warning('Nhập lại mật khẩu mới không khớp!');
       return;
     }
     try {
       await authApi.changePassword({ oldPassword, newPassword });
-      alert('Đổi mật khẩu bảo mật thành công!');
+      message.success('Đổi mật khẩu bảo mật thành công!');
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err: any) {
-      alert(err.message || 'Lỗi đổi mật khẩu');
+      message.error(err.message || 'Lỗi đổi mật khẩu');
     }
   };
 

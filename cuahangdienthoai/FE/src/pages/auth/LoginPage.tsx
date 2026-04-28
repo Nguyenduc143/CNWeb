@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import authApi from '../../api/authApi';
 import '../../assets/Auth.css';
 
@@ -33,12 +34,10 @@ const LoginPage: React.FC = () => {
         sessionStorage.setItem('access_token', res.token);
         localStorage.removeItem('remembered_email');
       }
-      alert('Đăng nhập thành công! Xin chào ' + (res.user?.fullName || res.user?.username));
-      
-      // Luôn chuyển về trang chủ (cửa hàng) sau khi đăng nhập thành công
-      window.location.href = '/';
+      message.success('Đăng nhập thành công! Xin chào ' + (res.user?.fullName || res.user?.username));
+      navigate('/');
     } catch (error: any) {
-      alert(typeof error === 'string' ? error : error?.message || 'Đăng nhập thất bại.');
+      message.error(typeof error === 'string' ? error : error?.message || 'Đăng nhập thất bại.');
     }
   };
 

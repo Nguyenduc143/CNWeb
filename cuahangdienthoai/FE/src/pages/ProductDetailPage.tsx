@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import catalogApi from '../api/catalogApi';
 import { useCart } from '../context/CartContext';
 import '../assets/ProductDetailPage.css';
@@ -45,7 +46,7 @@ const ProductDetailPage: React.FC = () => {
       quantity: 1,
       image: thumbUrl
     });
-    alert(`Đã thêm ${product.Name} vào giỏ hàng!`);
+    message.success(`Đã thêm ${product.Name} vào giỏ hàng!`);
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {

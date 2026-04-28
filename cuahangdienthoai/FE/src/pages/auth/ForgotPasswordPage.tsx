@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import authApi from '../../api/authApi';
 import '../../assets/Auth.css';
 
@@ -13,10 +14,10 @@ const ForgotPasswordPage: React.FC = () => {
     e.preventDefault();
     try {
       await authApi.forgotPassword({ email, phone, newPassword });
-      alert('Tuyệt vời! Mật khẩu của bạn đã được đặt lại thành công.');
+      message.success('Tuyệt vời! Mật khẩu của bạn đã được đặt lại thành công.');
       navigate('/login');
     } catch (error: any) {
-      alert(typeof error === 'string' ? error : error?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại thông tin.');
+      message.error(typeof error === 'string' ? error : error?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại thông tin.');
     }
   };
 

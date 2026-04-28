@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import { useCart } from '../../context/CartContext';
 import checkoutApi from '../../api/checkoutApi';
 import authApi from '../../api/authApi';
@@ -24,7 +25,7 @@ const CheckoutPage: React.FC = () => {
     authApi.getProfile()
       .then(() => fetchAddresses())
       .catch(() => {
-        alert('Bạn cần đăng nhập để thanh toán');
+        message.error('Bạn cần đăng nhập để thanh toán');
         navigate('/login');
       });
   }, []);
@@ -44,7 +45,7 @@ const CheckoutPage: React.FC = () => {
 
   const handlePlaceOrder = async () => {
     if (!selectedAddr) {
-      alert('Vui lòng chọn hoặc thêm địa chỉ giao hàng!');
+      message.warning('Vui lòng chọn hoặc thêm địa chỉ giao hàng!');
       return;
     }
 
@@ -65,10 +66,10 @@ const CheckoutPage: React.FC = () => {
     try {
       await checkoutApi.createOrder(payload);
       clearCart();
-      alert('Tuyệt vời! Đơn hàng của bạn đã được đặt thành công.');
-      window.location.href = '/profile'; // Sang Hồ sơ để coi tiến độ đơn
+      message.success('Tuyệt vời! Đơn hàng của bạn đã được đặt thành công.');
+      navigate('/profile');
     } catch (err: any) {
-      alert(err.message || 'Lỗi tạo đơn hàng');
+      message.error(err.message || 'Lỗi tạo đơn hàng');
     }
   };
 

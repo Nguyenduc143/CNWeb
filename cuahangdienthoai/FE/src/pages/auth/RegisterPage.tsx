@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import authApi from '../../api/authApi';
 import '../../assets/Auth.css';
 
@@ -14,10 +15,10 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
     try {
       await authApi.register({ fullName, email, phone, password });
-      alert('Đăng ký tài khoản thành công! Mời bạn đăng nhập.');
+      message.success('Đăng ký tài khoản thành công! Mời bạn đăng nhập.');
       navigate('/login');
     } catch (error: any) {
-      alert(typeof error === 'string' ? error : error?.message || 'Đăng ký thất bại.');
+      message.error(typeof error === 'string' ? error : error?.message || 'Đăng ký thất bại.');
     }
   };
 
