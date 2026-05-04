@@ -60,6 +60,28 @@ const adminApi = {
   deleteProduct: (id: string) => {
     return axiosClient.delete(`/admin/products/${id}`);
   },
+  // --- Flash Sale ---
+  getFlashSales: () => {
+    return axiosClient.get('/admin/flash-sales');
+  },
+  getFlashSaleDetail: (id: number) => {
+    return axiosClient.get(`/admin/flash-sales/${id}`);
+  },
+  createFlashSale: (data: any) => {
+    return axiosClient.post('/admin/flash-sales', data);
+  },
+  updateFlashSale: (id: number, data: any) => {
+    return axiosClient.put(`/admin/flash-sales/${id}`, data);
+  },
+  deleteFlashSale: (id: number) => {
+    return axiosClient.delete(`/admin/flash-sales/${id}`);
+  },
+  addFlashSaleItem: (data: any) => {
+    return axiosClient.post('/admin/flash-sales/items', data);
+  },
+  removeFlashSaleItem: (itemId: number) => {
+    return axiosClient.delete(`/admin/flash-sales/items/${itemId}`);
+  },
   // --- Tin Tức ---
   getNews: () => {
     return axiosClient.get('/admin/news');
@@ -72,7 +94,20 @@ const adminApi = {
   },
   deleteNews: (id: number) => {
     return axiosClient.delete(`/admin/news/${id}`);
-  }
+  },
+  // --- Banner ---
+  getBanners: () => {
+    return axiosClient.get('/admin/banners');
+  },
+  createBanner: (data: any) => {
+    return axiosClient.post('/admin/banners', data);
+  },
+  updateBanner: (id: number, data: any) => {
+    return axiosClient.put(`/admin/banners/${id}`, data);
+  },
+  deleteBanner: (id: number) => {
+    return axiosClient.delete(`/admin/banners/${id}`);
+  },
 };
 
 export default adminApi;

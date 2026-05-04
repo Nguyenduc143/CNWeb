@@ -163,6 +163,63 @@ export const adminService = {
     return true;
   },
 
+  // --- QUẢN LÝ FLASH SALE ---
+  getFlashSales: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().execute('sp_Admin_GetFlashSales');
+    return result.recordset;
+  },
+  getFlashSaleDetail: async (id: number) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('Id', sql.Int, id)
+      .execute('sp_Admin_GetFlashSaleDetail');
+    const recordsets = result.recordsets as any[][];
+    if (!recordsets || recordsets[0].length === 0) return null;
+    return { event: recordsets[0][0], items: recordsets[1] || [] };
+  },
+  createFlashSale: async (data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('TenSuKien', sql.NVarChar, data.tenSuKien)
+      .input('ThoiGianBatDau', sql.DateTime2, data.thoiGianBatDau)
+      .input('ThoiGianKetThuc', sql.DateTime2, data.thoiGianKetThuc)
+      .input('DangHoatDong', sql.Bit, data.dangHoatDong !== false ? 1 : 0)
+      .execute('sp_Admin_CreateFlashSale');
+    return result.recordset[0];
+  },
+  updateFlashSale: async (id: number, data: any) => {
+    const pool = await getConnection();
+    await pool.request()
+      .input('Id', sql.Int, id)
+      .input('TenSuKien', sql.NVarChar, data.tenSuKien)
+      .input('ThoiGianBatDau', sql.DateTime2, data.thoiGianBatDau)
+      .input('ThoiGianKetThuc', sql.DateTime2, data.thoiGianKetThuc)
+      .input('DangHoatDong', sql.Bit, data.dangHoatDong ? 1 : 0)
+      .execute('sp_Admin_UpdateFlashSale');
+    return true;
+  },
+  deleteFlashSale: async (id: number) => {
+    const pool = await getConnection();
+    await pool.request().input('Id', sql.Int, id).execute('sp_Admin_DeleteFlashSale');
+    return true;
+  },
+  addFlashSaleItem: async (data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('MaFlashSale', sql.Int, data.maFlashSale)
+      .input('MaSanPham', sql.UniqueIdentifier, data.maSanPham)
+      .input('GiaFlashSale', sql.Decimal(18,2), data.giaFlashSale)
+      .input('SoLuongGioiHan', sql.Int, data.soLuongGioiHan || 0)
+      .execute('sp_Admin_AddFlashSaleItem');
+    return result.recordset[0];
+  },
+  removeFlashSaleItem: async (id: number) => {
+    const pool = await getConnection();
+    await pool.request().input('MaChiTiet', sql.Int, id).execute('sp_Admin_RemoveFlashSaleItem');
+    return true;
+  },
+
   // --- QUẢN LÝ TIN TỨC ---
   getAllNews: async () => {
     const pool = await getConnection();
@@ -199,5 +256,70 @@ export const adminService = {
         .input('Id', sql.Int, id)
         .execute('sp_Admin_DeleteNews');
     return true;
-  }
+  },
+
+  // --- QUẢN LÝ BANNER ---
+  getAllBanners: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().query(
+      `SELECT MaBanner, TieuDe, TieuDePhu, MoTa, GiaHienThi, NutText, NutLink,
+              HinhAnh, MauNen, TagText, TagIcon, ThuTu, DangHoatDong
+       FROM Banner ORDER BY ThuTu ASC`
+    );
+    return result.recordset;
+  },
+
+  createBanner: async (data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('TieuDe', sql.NVarChar, data.TieuDe)
+      .input('TieuDePhu', sql.NVarChar, data.TieuDePhu || null)
+      .input('MoTa', sql.NVarChar, data.MoTa || null)
+      .input('GiaHienThi', sql.NVarChar, data.GiaHienThi || null)
+      .input('NutText', sql.NVarChar, data.NutText || 'Xem ngay')
+      .input('NutLink', sql.NVarChar, data.NutLink || '/products')
+      .input('HinhAnh', sql.NVarChar, data.HinhAnh || null)
+      .input('MauNen', sql.NVarChar, data.MauNen || 'linear-gradient(135deg, #0a0a1a 0%, #13131f 100%)')
+      .input('TagText', sql.NVarChar, data.TagText || null)
+      .input('TagIcon', sql.NVarChar, data.TagIcon || 'star')
+      .input('ThuTu', sql.Int, data.ThuTu || 99)
+      .input('DangHoatDong', sql.Bit, data.DangHoatDong !== false ? 1 : 0)
+      .query(`INSERT INTO Banner (TieuDe, TieuDePhu, MoTa, GiaHienThi, NutText, NutLink, HinhAnh, MauNen, TagText, TagIcon, ThuTu, DangHoatDong)
+              OUTPUT INSERTED.*
+              VALUES (@TieuDe, @TieuDePhu, @MoTa, @GiaHienThi, @NutText, @NutLink, @HinhAnh, @MauNen, @TagText, @TagIcon, @ThuTu, @DangHoatDong)`);
+    return result.recordset[0];
+  },
+
+  updateBanner: async (id: number, data: any) => {
+    const pool = await getConnection();
+    await pool.request()
+      .input('Id', sql.Int, id)
+      .input('TieuDe', sql.NVarChar, data.TieuDe)
+      .input('TieuDePhu', sql.NVarChar, data.TieuDePhu || null)
+      .input('MoTa', sql.NVarChar, data.MoTa || null)
+      .input('GiaHienThi', sql.NVarChar, data.GiaHienThi || null)
+      .input('NutText', sql.NVarChar, data.NutText || 'Xem ngay')
+      .input('NutLink', sql.NVarChar, data.NutLink || '/products')
+      .input('HinhAnh', sql.NVarChar, data.HinhAnh || null)
+      .input('MauNen', sql.NVarChar, data.MauNen || 'linear-gradient(135deg, #0a0a1a 0%, #13131f 100%)')
+      .input('TagText', sql.NVarChar, data.TagText || null)
+      .input('TagIcon', sql.NVarChar, data.TagIcon || 'star')
+      .input('ThuTu', sql.Int, data.ThuTu || 99)
+      .input('DangHoatDong', sql.Bit, data.DangHoatDong ? 1 : 0)
+      .query(`UPDATE Banner SET
+                TieuDe=@TieuDe, TieuDePhu=@TieuDePhu, MoTa=@MoTa,
+                GiaHienThi=@GiaHienThi, NutText=@NutText, NutLink=@NutLink,
+                HinhAnh=@HinhAnh, MauNen=@MauNen, TagText=@TagText,
+                TagIcon=@TagIcon, ThuTu=@ThuTu, DangHoatDong=@DangHoatDong
+              WHERE MaBanner=@Id`);
+    return true;
+  },
+
+  deleteBanner: async (id: number) => {
+    const pool = await getConnection();
+    await pool.request()
+      .input('Id', sql.Int, id)
+      .query('DELETE FROM Banner WHERE MaBanner = @Id');
+    return true;
+  },
 };

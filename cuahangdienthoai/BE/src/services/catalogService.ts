@@ -43,6 +43,32 @@ export const catalogService = {
     return { products, totalCount };
   },
 
+  getActiveFlashSale: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().execute('sp_GetActiveFlashSale');
+
+    const recordsets = result.recordsets as any[];
+    // Nếu không có flash sale nào
+    if (!recordsets || recordsets.length < 2 || recordsets[0].length === 0 || recordsets[0][0].MaFlashSale === null) {
+      return null;
+    }
+
+    const event = recordsets[0][0];
+    const items = recordsets[1] || [];
+    return { event, items };
+  },
+
+  getBanners: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().query(
+      `SELECT MaBanner, TieuDe, TieuDePhu, MoTa, GiaHienThi, NutText, NutLink, HinhAnh, MauNen, TagText, TagIcon, ThuTu
+       FROM Banner
+       WHERE DangHoatDong = 1
+       ORDER BY ThuTu ASC`
+    );
+    return result.recordset;
+  },
+
   getProductBySlug: async (slug: string) => {
     const pool = await getConnection();
     const result = await pool.request()

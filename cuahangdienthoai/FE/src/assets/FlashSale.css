@@ -103,6 +103,40 @@
   color: #fff;
 }
 
+/* Flash Sale Progress Bar */
+.flash-progress-wrap {
+  margin: 8px 0 4px;
+}
+
+.flash-progress-bar {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background: #ffe0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.flash-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff416c, #ff4b2b);
+  border-radius: 10px;
+  transition: width 0.6s ease;
+  min-width: 0;
+}
+
+.flash-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
 /* Product grid */
 .product-grid {
   display: grid;

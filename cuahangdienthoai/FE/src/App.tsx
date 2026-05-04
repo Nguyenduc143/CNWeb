@@ -22,6 +22,8 @@ import BrandManager from './pages/admin/BrandManager';
 import OrderManager from './pages/admin/OrderManager';
 import UserManager from './pages/admin/UserManager';
 import NewsManager from './pages/admin/NewsManager'; // Cập nhật module
+import FlashSaleManager from './pages/admin/FlashSaleManager';
+import BannerManager from './pages/admin/BannerManager';
 import AboutPage from './pages/AboutPage';
 import { useScrollTop } from './hooks/useScrollTop';
 import './index.css';
@@ -82,6 +84,8 @@ function App() {
               <Route path="orders" element={<OrderManager />} />
               <Route path="users" element={<UserManager />} />
               <Route path="news" element={<NewsManager />} />
+              <Route path="flash-sale" element={<FlashSaleManager />} />
+              <Route path="banners" element={<BannerManager />} />
             </Route>
           </Routes>
         </div>

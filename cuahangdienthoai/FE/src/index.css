@@ -6,13 +6,12 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  /* Thêm 'Roboto' và system-ui để hỗ trợ ký tự ₫ tiếng Việt */
+  font-family: 'Inter', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f8f9fa; /* Softer background */
-  color: #1f2937; /* Softer text color */
+  background: #f8f9fa;
+  color: #1f2937;
 }
 
 img {

@@ -38,10 +38,25 @@ router.post('/products', adminController.createProduct);
 router.put('/products/:id', adminController.updateProduct);
 router.delete('/products/:id', adminController.deleteProduct);
 
+// Nhánh Quản lý Flash Sale
+router.get('/flash-sales', adminController.getFlashSales);
+router.get('/flash-sales/:id', adminController.getFlashSaleDetail);
+router.post('/flash-sales', adminController.createFlashSale);
+router.put('/flash-sales/:id', adminController.updateFlashSale);
+router.delete('/flash-sales/:id', adminController.deleteFlashSale);
+router.post('/flash-sales/items', adminController.addFlashSaleItem);
+router.delete('/flash-sales/items/:itemId', adminController.removeFlashSaleItem);
+
 // Nhánh Quản lý Tin Tức
 router.get('/news', adminController.getAllNews);
 router.post('/news', adminController.createNews);
 router.put('/news/:id', adminController.updateNews);
 router.delete('/news/:id', adminController.deleteNews);
+
+// Nhánh Quản lý Banner
+router.get('/banners', adminController.getAllBanners);
+router.post('/banners', adminController.createBanner);
+router.put('/banners/:id', adminController.updateBanner);
+router.delete('/banners/:id', adminController.deleteBanner);
 
 export default router;

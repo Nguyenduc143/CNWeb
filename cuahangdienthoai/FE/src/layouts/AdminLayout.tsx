@@ -9,6 +9,8 @@ import {
   UserOutlined,
   LogoutOutlined,
   ProfileOutlined,
+  ThunderboltOutlined,
+  PictureOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
@@ -70,6 +72,16 @@ const AdminLayout: React.FC = () => {
               key: '/admin/orders',
               icon: <ShoppingCartOutlined />,
               label: 'Quản Lý Đơn Hàng',
+            },
+            {
+              key: '/admin/flash-sale',
+              icon: <ThunderboltOutlined />,
+              label: 'Flash Sale',
+            },
+            {
+              key: '/admin/banners',
+              icon: <PictureOutlined />,
+              label: 'Quản Lý Banner',
             },
             {
               key: '/admin/news',

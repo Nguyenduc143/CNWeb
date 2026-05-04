@@ -148,6 +148,52 @@ export const adminController = {
     }
   },
 
+  // --- Flash Sale ---
+  getFlashSales: async (req: Request, res: Response) => {
+    try {
+      const list = await adminService.getFlashSales();
+      return success(res, { flashSales: list }, 'Danh sách Flash Sale');
+    } catch (err) { return error(res, 'Lỗi lấy Flash Sale', 500); }
+  },
+  getFlashSaleDetail: async (req: Request, res: Response) => {
+    try {
+      const data = await adminService.getFlashSaleDetail(Number(req.params.id));
+      if (!data) return error(res, 'Không tìm thấy', 404);
+      return success(res, { flashSale: data.event, items: data.items }, 'Chi tiết Flash Sale');
+    } catch (err) { return error(res, 'Lỗi', 500); }
+  },
+  createFlashSale: async (req: Request, res: Response) => {
+    try {
+      const created = await adminService.createFlashSale(req.body);
+      return success(res, { flashSale: created }, 'Tạo Flash Sale thành công');
+    } catch (err) { return error(res, 'Lỗi tạo Flash Sale', 500); }
+  },
+  updateFlashSale: async (req: Request, res: Response) => {
+    try {
+      await adminService.updateFlashSale(Number(req.params.id), req.body);
+      return success(res, null, 'Cập nhật Flash Sale thành công');
+    } catch (err) { return error(res, 'Lỗi cập nhật', 500); }
+  },
+  deleteFlashSale: async (req: Request, res: Response) => {
+    try {
+      await adminService.deleteFlashSale(Number(req.params.id));
+      return success(res, null, 'Xóa Flash Sale thành công');
+    } catch (err) { return error(res, 'Lỗi xóa', 500); }
+  },
+  addFlashSaleItem: async (req: Request, res: Response) => {
+    try {
+      const result = await adminService.addFlashSaleItem(req.body);
+      if (result.Success === 0) return error(res, result.Message, 400);
+      return success(res, { item: result }, 'Thêm sản phẩm vào Flash Sale thành công');
+    } catch (err) { return error(res, 'Lỗi thêm sản phẩm', 500); }
+  },
+  removeFlashSaleItem: async (req: Request, res: Response) => {
+    try {
+      await adminService.removeFlashSaleItem(Number(req.params.itemId));
+      return success(res, null, 'Xóa sản phẩm khỏi Flash Sale thành công');
+    } catch (err) { return error(res, 'Lỗi xóa sản phẩm', 500); }
+  },
+
   // --- Tin Tức ---
   getAllNews: async (req: Request, res: Response) => {
     try {
@@ -172,5 +218,31 @@ export const adminController = {
       await adminService.deleteNews(Number(req.params.id));
       return success(res, null, 'Xóa bản tin thành công');
     } catch (err) { return error(res, 'Sự cố xóa dữ liệu', 500); }
-  }
+  },
+
+  // --- BANNER ---
+  getAllBanners: async (req: Request, res: Response) => {
+    try {
+      const banners = await adminService.getAllBanners();
+      return success(res, { banners }, 'Danh sách banner');
+    } catch (err) { return error(res, 'Lỗi lấy banner', 500); }
+  },
+  createBanner: async (req: Request, res: Response) => {
+    try {
+      const created = await adminService.createBanner(req.body);
+      return success(res, { banner: created }, 'Tạo banner thành công');
+    } catch (err) { return error(res, 'Lỗi tạo banner', 500); }
+  },
+  updateBanner: async (req: Request, res: Response) => {
+    try {
+      await adminService.updateBanner(Number(req.params.id), req.body);
+      return success(res, null, 'Cập nhật banner thành công');
+    } catch (err) { return error(res, 'Lỗi cập nhật banner', 500); }
+  },
+  deleteBanner: async (req: Request, res: Response) => {
+    try {
+      await adminService.deleteBanner(Number(req.params.id));
+      return success(res, null, 'Xóa banner thành công');
+    } catch (err) { return error(res, 'Lỗi xóa banner', 500); }
+  },
 };

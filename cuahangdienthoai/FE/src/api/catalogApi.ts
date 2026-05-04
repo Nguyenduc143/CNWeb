@@ -12,6 +12,9 @@ const catalogApi = {
   },
   getProductBySlug: (slug: string) => {
     return axiosClient.get(`/products/${slug}`);
+  },
+  getActiveFlashSale: () => {
+    return axiosClient.get('/flash-sale');
   }
 };
 

@@ -53,6 +53,29 @@ export const getProducts = async (req: Request, res: Response) => {
   }
 };
 
+export const getActiveFlashSale = async (req: Request, res: Response) => {
+  try {
+    const data = await catalogService.getActiveFlashSale();
+    if (!data) {
+      return success(res, { flashSale: null }, 'Hiện không có Flash Sale nào đang diễn ra');
+    }
+    return success(res, { flashSale: data.event, items: data.items }, 'Flash Sale đang diễn ra');
+  } catch (err: any) {
+    console.error('Lỗi Catalog Controller (FlashSale):', err);
+    return error(res, 'Gặp sự cố khi lấy Flash Sale', 500);
+  }
+};
+
+export const getBanners = async (req: Request, res: Response) => {
+  try {
+    const banners = await catalogService.getBanners();
+    return success(res, { banners }, 'Lấy banner thành công');
+  } catch (err: any) {
+    console.error('Lỗi Catalog Controller (Banner):', err);
+    return error(res, 'Gặp sự cố khi lấy Banner', 500);
+  }
+};
+
 export const getProductBySlug = async (req: Request, res: Response) => {
   try {
     const slug = req.params.slug as string;
