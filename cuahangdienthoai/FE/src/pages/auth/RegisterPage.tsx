@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 import authApi from '../../api/authApi';
+import { GoogleLogin } from '@react-oauth/google';
 import '../../assets/Auth.css';
 
 const RegisterPage: React.FC = () => {
@@ -95,6 +96,33 @@ const RegisterPage: React.FC = () => {
           <button type="submit" className="btn-auth">
             Đăng Ký Tài Khoản <ion-icon name="checkmark-circle-outline"></ion-icon>
           </button>
+          
+          <div className="auth-divider">
+            <span>HOẶC</span>
+          </div>
+          
+          <div className="google-login-wrapper" style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (credentialResponse.credential) {
+                  try {
+                    const res: any = await authApi.googleLogin(credentialResponse.credential);
+                    localStorage.removeItem('access_token');
+                    sessionStorage.removeItem('access_token');
+                    localStorage.setItem('access_token', res.token);
+                    message.success('Đăng nhập Google thành công! Xin chào ' + (res.user?.fullName || res.user?.username));
+                    navigate('/');
+                  } catch (error: any) {
+                    message.error(typeof error === 'string' ? error : error?.message || 'Đăng nhập Google thất bại.');
+                  }
+                }
+              }}
+              onError={() => {
+                message.error('Đăng nhập Google thất bại');
+              }}
+              useOneTap
+            />
+          </div>
         </form>
         
         <div className="auth-footer">

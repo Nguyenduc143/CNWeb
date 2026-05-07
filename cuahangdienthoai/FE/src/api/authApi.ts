@@ -51,6 +51,12 @@ const authApi = {
   changePassword(data: { oldPassword: string; newPassword: string }): Promise<any> {
     const url = '/auth/me/change-password';
     return axiosClient.put(url, data);
+  },
+
+  // Đăng nhập Google
+  googleLogin(token: string): Promise<AuthResponse> {
+    const url = '/auth/google-login';
+    return axiosClient.post(url, { token });
   }
 };
 

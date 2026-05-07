@@ -127,5 +127,32 @@ export const authService = {
       .execute('sp_UpdatePasswordByUserId');
 
     return true;
+  },
+  //login with google
+  loginWithGoogle: async (email: string, googleId: string, fullName: string, avatarUrl: string) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('Email', sql.NVarChar, email)
+      .input('GoogleId', sql.NVarChar, googleId)
+      .input('FullName', sql.NVarChar, fullName)
+      .input('AvatarUrl', sql.NVarChar, avatarUrl)
+      .execute('sp_LoginWithGoogle');
+
+    if (result.recordset.length === 0) {
+      throw new Error('Không thể đăng nhập bằng Google');
+    }
+
+    const user = result.recordset[0];
+    if (user.IsLocked) {
+      throw new Error('Tài khoản đã bị khóa từ hệ thống');
+    }
+
+    return {
+      Id: user.UserId,
+      Username: user.Username, // returned as Email aliased to Username
+      FullName: user.FullName,
+      Role: user.Role,
+      Avatar: user.Avatar
+    };
   }
 };

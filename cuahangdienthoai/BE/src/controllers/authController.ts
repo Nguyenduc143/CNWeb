@@ -3,6 +3,10 @@ import { authService } from '../services/authService';
 import { success, error } from '../utils/response';
 import { generateToken } from '../utils/jwt';
 import { AuthRequest } from '../middlewares/authMiddleware';
+// Google OAuth
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -176,5 +180,53 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
       return error(res, 'Mật khẩu cũ không chính xác', 400);
     }
     return error(res, 'Không thể đổi mật khẩu, vui lòng thử lại', 500);
+  }
+};
+//login with google
+export const googleLogin = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return error(res, 'Google token is required', 400);
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return error(res, 'Invalid Google token', 401);
+    }
+
+    const { email, sub: googleId, name, picture } = payload;
+    
+    if (!email) {
+       return error(res, 'Google account missing email', 400);
+    }
+
+    const user = await authService.loginWithGoogle(email, googleId, name || '', picture || '');
+
+    const jwtToken = generateToken({
+      id: user.Id,
+      username: user.Username,
+      role: user.Role
+    });
+
+    return success(res, {
+      user: {
+        id: user.Id,
+        username: user.Username,
+        fullName: user.FullName,
+        role: user.Role,
+        avatar: user.Avatar
+      },
+      token: jwtToken
+    }, 'Đăng nhập Google thành công');
+
+  } catch (err: any) {
+    console.error('Google login error:', err);
+    return error(res, 'Đăng nhập Google thất bại', 500);
   }
 };
