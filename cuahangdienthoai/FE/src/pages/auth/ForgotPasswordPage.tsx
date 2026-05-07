@@ -6,18 +6,34 @@ import '../../assets/Auth.css';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [otpCode, setOtpCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
   const navigate = useNavigate();
+
+  const handleSendOtp = async () => {
+    if (!email) {
+      return message.error('Vui lòng nhập Email trước khi gửi mã.');
+    }
+    setIsSendingOtp(true);
+    try {
+      await authApi.forgotPassword({ email });
+      message.success('Mã xác thực đã được gửi! Vui lòng kiểm tra email của bạn.');
+    } catch (error: any) {
+      message.error(typeof error === 'string' ? error : error?.message || 'Không thể gửi mã xác thực.');
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await authApi.forgotPassword({ email, phone, newPassword });
+      await authApi.resetPassword({ email, otpCode, newPassword });
       message.success('Tuyệt vời! Mật khẩu của bạn đã được đặt lại thành công.');
       navigate('/login');
     } catch (error: any) {
-      message.error(typeof error === 'string' ? error : error?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại thông tin.');
+      message.error(typeof error === 'string' ? error : error?.message || 'Mã xác thực không hợp lệ hoặc đã hết hạn.');
     }
   };
 
@@ -47,17 +63,35 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="phone">Số điện thoại đăng ký</label>
-            <div className="input-wrapper">
-              <ion-icon name="call-outline"></ion-icon>
-              <input
-                type="tel"
-                id="phone"
-                placeholder="Nhập SĐT"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
+            <label htmlFor="otpCode">Mã xác thực (OTP)</label>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div className="input-wrapper" style={{ flex: 1 }}>
+                <ion-icon name="keypad-outline"></ion-icon>
+                <input
+                  type="text"
+                  id="otpCode"
+                  placeholder="Nhập mã 6 số"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  maxLength={6}
+                  required
+                />
+              </div>
+              <button 
+                type="button" 
+                onClick={handleSendOtp} 
+                disabled={isSendingOtp}
+                style={{ 
+                  background: isSendingOtp ? '#95a5a6' : '#0066cc', 
+                  color: 'white', 
+                  border: 'none', 
+                  borderRadius: '12px', 
+                  padding: '0 15px', 
+                  cursor: isSendingOtp ? 'not-allowed' : 'pointer',
+                  fontWeight: '600'
+                }}>
+                {isSendingOtp ? 'Đang gửi...' : 'Gửi mã'}
+              </button>
             </div>
           </div>
           

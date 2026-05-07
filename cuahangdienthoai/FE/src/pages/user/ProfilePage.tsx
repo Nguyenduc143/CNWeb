@@ -28,6 +28,9 @@ const ProfilePage: React.FC = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -120,18 +123,36 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleSendOtp = async () => {
+    setIsSendingOtp(true);
+    try {
+      await authApi.sendChangePasswordOTP();
+      setIsOtpSent(true);
+      message.success('Mã xác thực đã được gửi đến email của bạn!');
+    } catch (error: any) {
+      message.error(error.message || 'Lỗi gửi mã xác thực');
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isOtpSent) {
+      return message.warning('Vui lòng gửi và nhập mã xác thực OTP trước.');
+    }
     if (newPassword !== confirmPassword) {
       message.warning('Nhập lại mật khẩu mới không khớp!');
       return;
     }
     try {
-      await authApi.changePassword({ oldPassword, newPassword });
+      await authApi.changePassword({ oldPassword, newPassword, otpCode });
       message.success('Đổi mật khẩu bảo mật thành công!');
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      setOtpCode('');
+      setIsOtpSent(false);
     } catch (err: any) {
       message.error(err.message || 'Lỗi đổi mật khẩu');
     }
@@ -369,6 +390,32 @@ const ProfilePage: React.FC = () => {
                   <input 
                     type="password" placeholder="Nhập lại mật khẩu mới ở trên" value={confirmPassword} 
                     onChange={(e) => setConfirmPassword(e.target.value)} required minLength={6} className="form-input" />
+                </div>
+                <div className="form-group-row" style={{ alignItems: 'flex-start' }}>
+                  <label className="form-label" style={{ paddingTop: '8px' }}>Mã Xác Thực (OTP)</label>
+                  <div style={{ display: 'flex', gap: '10px', flex: 1 }}>
+                    <input 
+                      type="text" placeholder="Nhập mã 6 số" value={otpCode} 
+                      onChange={(e) => setOtpCode(e.target.value)} required={isOtpSent} maxLength={6} className="form-input" 
+                      style={{ flex: 1 }}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={handleSendOtp} 
+                      disabled={isSendingOtp}
+                      style={{ 
+                        background: isSendingOtp ? '#95a5a6' : '#0066cc', 
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '6px', 
+                        padding: '0 15px', 
+                        cursor: isSendingOtp ? 'not-allowed' : 'pointer',
+                        fontWeight: '600',
+                        whiteSpace: 'nowrap'
+                      }}>
+                      {isSendingOtp ? 'Đang gửi...' : (isOtpSent ? 'Gửi lại mã' : 'Gửi mã OTP')}
+                    </button>
+                  </div>
                 </div>
                 <div className="form-actions">
                   <button type="submit" className="btn-primary">Lưu Mật Khẩu</button>

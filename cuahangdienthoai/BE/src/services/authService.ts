@@ -1,6 +1,12 @@
 import sql from 'mssql';
 import bcrypt from 'bcryptjs';
 import { getConnection } from '../config/db';
+import { emailService } from './emailService';
+
+// Sinh OTP ngẫu nhiên 6 chữ số
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 export const authService = {
   login: async (loginId: string, passwordRaw: string) => {
@@ -26,6 +32,10 @@ export const authService = {
       return null; // Sai mật khẩu
     }
 
+    if (user.DaXacThucEmail === false) {
+      throw new Error('NOT_VERIFIED');
+    }
+
     return {
       Id: user.UserId,
       Username: user.Email,
@@ -39,12 +49,17 @@ export const authService = {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(passwordRaw, salt);
 
+    const otpCode = generateOTP();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 phút
+
     const pool = await getConnection();
     const result = await pool.request()
         .input('Email', sql.NVarChar, email)
         .input('PhoneNumber', sql.NVarChar, phone)
         .input('FullName', sql.NVarChar, fullName)
         .input('PasswordHash', sql.NVarChar, passwordHash)
+        .input('MaOTP', sql.NVarChar, otpCode)
+        .input('ThoiGianHetHanOTP', sql.DateTime2, otpExpiry)
         .execute('sp_RegisterUser');
 
     const newUser = result.recordset[0];
@@ -52,12 +67,26 @@ export const authService = {
       throw new Error('EMAIL_EXISTS');
     }
 
+    // Gửi email không đợi (hoặc có thể đợi tùy ý, ở đây đợi để báo lỗi nếu gửi lỗi)
+    await emailService.sendOTP(email, otpCode);
+
     return {
-      Id: newUser.UserId,
-      Username: newUser.Email,
-      FullName: newUser.FullName,
-      Role: 'Customer'
+      Email: newUser.Email
     };
+  },
+
+  verifyOTP: async (email: string, otpCode: string) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('Email', sql.NVarChar, email)
+      .input('MaOTP', sql.NVarChar, otpCode)
+      .execute('sp_VerifyOTP');
+
+    const status = result.recordset[0].ErrorCode;
+    if (status !== 'SUCCESS') {
+      throw new Error(status);
+    }
+    return true;
   },
 
   getProfile: async (userId: string) => {
@@ -82,25 +111,46 @@ export const authService = {
     return result.recordset[0];
   },
 
-  resetPassword: async (email: string, phone: string, newPasswordRaw: string) => {
+  forgotPasswordSendOTP: async (email: string) => {
+    const otpCode = generateOTP();
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 phút
+
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('Email', sql.NVarChar, email)
+      .input('MaOTP', sql.NVarChar, otpCode)
+      .input('ThoiGianHetHan', sql.DateTime2, otpExpiry)
+      .execute('sp_UpdateOTP');
+
+    const status = result.recordset[0].ErrorCode;
+    if (status === 'USER_NOT_FOUND') {
+      throw new Error('Không tìm thấy tài khoản với email này.');
+    }
+
+    await emailService.sendOTP(email, otpCode, 'reset_password');
+    return true;
+  },
+
+  resetPasswordWithOTP: async (email: string, otpCode: string, newPasswordRaw: string) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(newPasswordRaw, salt);
 
     const pool = await getConnection();
     const result = await pool.request()
       .input('Email', sql.NVarChar, email)
-      .input('PhoneNumber', sql.NVarChar, phone)
+      .input('MaOTP', sql.NVarChar, otpCode)
       .input('NewPasswordHash', sql.NVarChar, passwordHash)
-      .execute('sp_ResetPassword');
+      .execute('sp_ResetPasswordWithOTP');
 
-    const status = result.recordset[0];
-    if (status.Success === 0) {
-      throw new Error(status.Message);
-    }
-    return status;
+    const status = result.recordset[0].ErrorCode;
+    if (status === 'USER_NOT_FOUND') throw new Error('USER_NOT_FOUND');
+    if (status === 'INVALID_OR_EXPIRED_OTP') throw new Error('INVALID_OR_EXPIRED_OTP');
+
+    return true;
   },
 
-  changePassword: async (userId: string, oldPasswordRaw: string, newPasswordRaw: string) => {
+
+  changePassword: async (userId: string, oldPasswordRaw: string, newPasswordRaw: string, otpCode: string) => {
     const pool = await getConnection();
     
     const userResult = await pool.request()
@@ -115,19 +165,25 @@ export const authService = {
     const isMatch = await bcrypt.compare(oldPasswordRaw, currentHash);
     
     if (!isMatch) {
-      throw new Error('INCORRECT_OLD_PASSWORD');
+      throw new Error('WRONG_PASSWORD');
     }
 
     const salt = await bcrypt.genSalt(10);
-    const newHash = await bcrypt.hash(newPasswordRaw, salt);
+    const newPasswordHash = await bcrypt.hash(newPasswordRaw, salt);
 
-    await pool.request()
+    const updateResult = await pool.request()
       .input('UserId', sql.UniqueIdentifier, userId)
-      .input('NewPasswordHash', sql.NVarChar, newHash)
-      .execute('sp_UpdatePasswordByUserId');
+      .input('NewPasswordHash', sql.NVarChar, newPasswordHash)
+      .input('MaOTP', sql.NVarChar, otpCode)
+      .execute('sp_ChangePasswordWithOTP');
 
+    const status = updateResult.recordset[0].ErrorCode;
+    if (status === 'INVALID_OR_EXPIRED_OTP') {
+      throw new Error('INVALID_OR_EXPIRED_OTP');
+    }
     return true;
   },
+
   //login with google
   loginWithGoogle: async (email: string, googleId: string, fullName: string, avatarUrl: string) => {
     const pool = await getConnection();

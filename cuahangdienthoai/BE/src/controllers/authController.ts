@@ -45,9 +45,13 @@ export const login = async (req: Request, res: Response) => {
 
   } catch (err: any) {
     console.error('Login error:', err);
+    if (err.message === 'NOT_VERIFIED') {
+      return error(res, 'Tài khoản chưa xác thực Email. Vui lòng xác thực trước khi đăng nhập.', 403);
+    }
     return error(res, err.message || 'Login failed', 500);
   }
 };
+
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -57,23 +61,9 @@ export const register = async (req: Request, res: Response) => {
       return error(res, 'Thiếu thông tin đăng ký', 400);
     }
 
-    const user = await authService.register(email, phone, fullName, password);
+    const result = await authService.register(email, phone, fullName, password);
 
-    const token = generateToken({
-      id: user.Id,
-      username: user.Username,
-      role: user.Role
-    });
-
-    return success(res, {
-      user: {
-        id: user.Id,
-        username: user.Username,
-        fullName: user.FullName,
-        role: user.Role
-      },
-      token
-    }, 'Register successful');
+    return success(res, { email: result.Email }, 'Đăng ký thành công, vui lòng kiểm tra email để nhận mã OTP.');
 
   } catch (err: any) {
     console.error('Register error:', err);
@@ -83,6 +73,25 @@ export const register = async (req: Request, res: Response) => {
     return error(res, 'Registration failed', 500);
   }
 };
+
+export const verifyOTP = async (req: Request, res: Response) => {
+  try {
+    const { email, otpCode } = req.body;
+    if (!email || !otpCode) {
+      return error(res, 'Thiếu Email hoặc mã OTP', 400);
+    }
+
+    await authService.verifyOTP(email, otpCode);
+    return success(res, null, 'Xác thực tài khoản thành công! Bạn có thể đăng nhập.');
+  } catch (err: any) {
+    console.error('Verify OTP error:', err);
+    if (err.message === 'ALREADY_VERIFIED') return error(res, 'Tài khoản đã được xác thực trước đó.', 400);
+    if (err.message === 'INVALID_OR_EXPIRED_OTP') return error(res, 'Mã OTP không chính xác hoặc đã hết hạn.', 400);
+    if (err.message === 'USER_NOT_FOUND') return error(res, 'Không tìm thấy người dùng.', 404);
+    return error(res, 'Xác thực thất bại', 500);
+  }
+};
+
 
 export const me = async (req: AuthRequest, res: Response) => {
   try {
@@ -138,22 +147,54 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
 
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
-    const { email, phone, newPassword } = req.body;
+    const { email } = req.body;
+    if (!email) {
+      return error(res, 'Vui lòng nhập Email', 400);
+    }
 
-    if (!email || !phone || !newPassword) {
-      return error(res, 'Vui lòng nhập đầy đủ Email, Số điện thoại và Mật khẩu mới', 400);
+    await authService.forgotPasswordSendOTP(email);
+    return success(res, null, 'Mã xác thực đã được gửi đến email của bạn');
+  } catch (err: any) {
+    console.error('Forgot password error:', err);
+    return error(res, err.message || 'Lỗi gửi mã xác thực', 400);
+  }
+};
+
+export const resetPasswordWithOTP = async (req: Request, res: Response) => {
+  try {
+    const { email, otpCode, newPassword } = req.body;
+
+    if (!email || !otpCode || !newPassword) {
+      return error(res, 'Vui lòng nhập đầy đủ thông tin', 400);
     }
 
     if (newPassword.length < 6) {
       return error(res, 'Mật khẩu mới phải có ít nhất 6 ký tự', 400);
     }
 
-    await authService.resetPassword(email, phone, newPassword);
-    
+    await authService.resetPasswordWithOTP(email, otpCode, newPassword);
     return success(res, null, 'Đặt lại mật khẩu thành công');
   } catch (err: any) {
-    console.error('Forgot password error:', err);
-    return error(res, err.message || 'Lỗi đặt lại mật khẩu', 400);
+    console.error('Reset password error:', err);
+    if (err.message === 'USER_NOT_FOUND') return error(res, 'Không tìm thấy tài khoản', 404);
+    if (err.message === 'INVALID_OR_EXPIRED_OTP') return error(res, 'Mã xác thực không hợp lệ hoặc đã hết hạn', 400);
+    return error(res, 'Lỗi đặt lại mật khẩu', 500);
+  }
+};
+
+
+export const sendChangePasswordOTP = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) return error(res, 'Vui lòng đăng nhập', 401);
+    
+    const userProfile = await authService.getProfile(req.user.id);
+    if (!userProfile) return error(res, 'Không tìm thấy người dùng', 404);
+
+    await authService.forgotPasswordSendOTP(userProfile.Email);
+    return success(res, null, 'Mã xác thực đã được gửi đến email của bạn');
+  } catch (err: any) {
+    console.error('Send change password OTP error:', err);
+    return error(res, 'Lỗi gửi mã xác thực', 500);
   }
 };
 
@@ -162,22 +203,25 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
     if (!req.user) {
       return error(res, 'Vui lòng đăng nhập', 401);
     }
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword, otpCode } = req.body;
     
-    if (!oldPassword || !newPassword) {
-      return error(res, 'Vui lòng điền đủ mật khẩu cũ và mới', 400);
+    if (!oldPassword || !newPassword || !otpCode) {
+      return error(res, 'Vui lòng điền đủ mật khẩu cũ, mật khẩu mới và mã OTP', 400);
     }
     if (newPassword.length < 6) {
       return error(res, 'Mật khẩu mới phải tối thiểu 6 ký tự', 400);
     }
 
-    await authService.changePassword(req.user.id, oldPassword, newPassword);
+    await authService.changePassword(req.user.id, oldPassword, newPassword, otpCode);
     
     return success(res, null, 'Đổi mật khẩu thành công');
   } catch (err: any) {
     console.error('Change password error:', err);
-    if (err.message === 'INCORRECT_OLD_PASSWORD') {
+    if (err.message === 'WRONG_PASSWORD') {
       return error(res, 'Mật khẩu cũ không chính xác', 400);
+    }
+    if (err.message === 'INVALID_OR_EXPIRED_OTP') {
+      return error(res, 'Mã xác thực không hợp lệ hoặc đã hết hạn', 400);
     }
     return error(res, 'Không thể đổi mật khẩu, vui lòng thử lại', 500);
   }

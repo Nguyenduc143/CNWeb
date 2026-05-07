@@ -43,20 +43,37 @@ const authApi = {
     return axiosClient.put(url, data);
   },
 
-  forgotPassword(data: { email: string; phone: string; newPassword: string }): Promise<any> {
+  forgotPassword(data: { email: string }): Promise<any> {
     const url = '/auth/forgot-password';
     return axiosClient.post(url, data);
   },
 
-  changePassword(data: { oldPassword: string; newPassword: string }): Promise<any> {
+  resetPassword(data: { email: string; otpCode: string; newPassword: string }): Promise<any> {
+    const url = '/auth/reset-password';
+    return axiosClient.post(url, data);
+  },
+
+  sendChangePasswordOTP(): Promise<any> {
+    const url = '/auth/me/send-otp';
+    return axiosClient.post(url);
+  },
+
+  changePassword(data: { oldPassword: string; newPassword: string; otpCode: string }): Promise<any> {
     const url = '/auth/me/change-password';
     return axiosClient.put(url, data);
   },
+
 
   // Đăng nhập Google
   googleLogin(token: string): Promise<AuthResponse> {
     const url = '/auth/google-login';
     return axiosClient.post(url, { token });
+  },
+
+  // Xác thực OTP
+  verifyOTP(data: { email: string; otpCode: string }): Promise<any> {
+    const url = '/auth/verify-otp';
+    return axiosClient.post(url, data);
   }
 };
 
