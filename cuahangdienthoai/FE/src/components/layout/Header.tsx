@@ -36,7 +36,7 @@ const Header: React.FC = () => {
            console.error(err);
            setIsSearching(false);
        });
-    }, 500);
+    }, 1);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -170,7 +170,7 @@ const Header: React.FC = () => {
               <Link to="/"><ion-icon name="home-outline"></ion-icon> Trang Chủ</Link>
             </li>
             <li className="nav-item has-dropdown">
-              <Link to="#"><ion-icon name="grid-outline"></ion-icon> Danh Mục</Link>
+              <Link to="/products"><ion-icon name="grid-outline"></ion-icon> Danh Mục</Link>
               <ul className="dropdown">
                 {categories.map((c) => (
                   <li key={c.CategoryId}>

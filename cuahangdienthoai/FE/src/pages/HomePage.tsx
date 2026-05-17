@@ -3,21 +3,34 @@ import HeroBanner from '../components/ui/HeroBanner';
 import FlashSale from '../components/ui/FlashSale';
 import ProductSection from '../components/ui/ProductSection';
 import catalogApi from '../api/catalogApi';
+import { ICON_MAP } from './admin/BrandSectionManager';
 import '../assets/HomePage.css';
 
 const HomePage: React.FC = () => {
-  const [iphones, setIphones] = useState<any[]>([]);
-  const [samsungs, setSamsungs] = useState<any[]>([]);
+  const [sections, setSections] = useState<any[]>([]);
+  const [productMap, setProductMap] = useState<Record<number, any[]>>({});
 
   useEffect(() => {
-    // BrandId=1 là Apple
-    catalogApi.getProducts({ brandId: 1, pageSize: 4 })
-      .then((res: any) => setIphones(res.data?.products || res.products || []))
-      .catch(console.error);
+    // Lấy danh sách dải từ DB (Admin quản lý, không cần sửa code)
+    catalogApi.getDaiSanPham()
+      .then(async (res: any) => {
+        const list = res.data?.daiSanPham || res.daiSanPham || [];
+        setSections(list);
 
-    // BrandId=2 là Samsung
-    catalogApi.getProducts({ brandId: 2, pageSize: 4 })
-      .then((res: any) => setSamsungs(res.data?.products || res.products || []))
+        // Fetch song song tất cả sản phẩm cho từng dải
+        const fetches = list.map((s: any) =>
+          catalogApi.getProducts({ brandId: s.MaThuongHieu, pageSize: s.SoSanPhamHienThi })
+            .then((r: any) => ({
+              brandId: s.MaThuongHieu,
+              products: r.data?.products || r.products || [],
+            }))
+        );
+
+        const results = await Promise.all(fetches);
+        const map: Record<number, any[]> = {};
+        results.forEach(({ brandId, products }: any) => { map[brandId] = products; });
+        setProductMap(map);
+      })
       .catch(console.error);
   }, []);
 
@@ -27,26 +40,17 @@ const HomePage: React.FC = () => {
 
       <FlashSale />
 
-      <ProductSection
-        title="iPhone"
-        icon={<ion-icon name="logo-apple"></ion-icon>}
-        products={iphones}
-        viewAllLink="/iphone"
-        subCategories={[
-          { label: 'iPhone Nhập Khẩu Mới', href: '/iphone' },
-        ]}
-      />
-
-      <ProductSection
-        title="Samsung Galaxy"
-        icon={<ion-icon name="phone-portrait-outline"></ion-icon>}
-        products={samsungs}
-        viewAllLink="/samsung"
-        subCategories={[
-          { label: 'Galaxy S Series', href: '/samsung' },
-          { label: 'Galaxy Z Fold/Flip', href: '/samsung' },
-        ]}
-      />
+      {/* Render động từ DB - Admin quản lý hoàn toàn */}
+      {sections.map((section: any) => (
+        <ProductSection
+          key={section.MaDai}
+          title={section.TieuDe}
+          icon={ICON_MAP[section.Icon]}
+          products={productMap[section.MaThuongHieu] || []}
+          viewAllLink={section.DuongDanXemTat}
+          subCategories={[]}
+        />
+      ))}
 
       {/* About section */}
       <section className="about-section">

@@ -24,6 +24,7 @@ import UserManager from './pages/admin/UserManager';
 import NewsManager from './pages/admin/NewsManager'; // Cập nhật module
 import FlashSaleManager from './pages/admin/FlashSaleManager';
 import BannerManager from './pages/admin/BannerManager';
+import BrandSectionManager from './pages/admin/BrandSectionManager';
 import AboutPage from './pages/AboutPage';
 import { useScrollTop } from './hooks/useScrollTop';
 import './index.css';
@@ -61,6 +62,18 @@ function App() {
                 path="/samsung"
                 element={<ProductListPage title="Samsung Galaxy" icon={<ion-icon name="phone-portrait-outline"></ion-icon>} brandId={2} />}
               />
+              <Route
+                path="/xiaomi"
+                element={<ProductListPage title="Xiaomi" icon={<ion-icon name="hardware-chip-outline"></ion-icon>} brandId={4} />}
+              />
+              <Route
+                path="/oppo"
+                element={<ProductListPage title="Oppo" icon={<ion-icon name="color-palette-outline"></ion-icon>} brandId={3} />}
+              />
+              <Route
+                path="/products"
+                element={<ProductListPage title="Tất Cả Sản Phẩm" icon={<ion-icon name="grid-outline"></ion-icon>} />}
+              />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
@@ -86,6 +99,7 @@ function App() {
               <Route path="news" element={<NewsManager />} />
               <Route path="flash-sale" element={<FlashSaleManager />} />
               <Route path="banners" element={<BannerManager />} />
+              <Route path="brand-sections" element={<BrandSectionManager />} />
             </Route>
           </Routes>
         </div>

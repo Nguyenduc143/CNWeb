@@ -59,4 +59,10 @@ router.post('/banners', adminController.createBanner);
 router.put('/banners/:id', adminController.updateBanner);
 router.delete('/banners/:id', adminController.deleteBanner);
 
+// Nhánh Quản lý Dải Sản Phẩm Trang Chủ
+router.get('/dai-san-pham', adminController.getDaiSanPham);
+router.post('/dai-san-pham', adminController.createDaiSanPham);
+router.put('/dai-san-pham/:id', adminController.updateDaiSanPham);
+router.delete('/dai-san-pham/:id', adminController.deleteDaiSanPham);
+
 export default router;

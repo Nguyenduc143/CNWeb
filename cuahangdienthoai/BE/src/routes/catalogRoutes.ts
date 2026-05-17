@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCategories, getBrands, getProducts, getProductBySlug, getActiveFlashSale, getBanners } from '../controllers/catalogController';
+import { getCategories, getBrands, getProducts, getProductBySlug, getActiveFlashSale, getBanners, getDaiSanPhamActive } from '../controllers/catalogController';
 import { getNewsList, getNewsDetail } from '../controllers/newsController';
 
 const router = Router();
@@ -13,6 +13,9 @@ router.get('/products/:slug', getProductBySlug);
 
 // Flash Sale
 router.get('/flash-sale', getActiveFlashSale);
+
+// Dải Sản Phẩm Trang Chủ
+router.get('/dai-san-pham', getDaiSanPhamActive);
 
 // News
 router.get('/news', getNewsList);

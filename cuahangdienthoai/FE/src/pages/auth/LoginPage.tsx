@@ -23,16 +23,13 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     try {
       const res: any = await authApi.login({ email, password });
-      // Xóa triệt để các phiên bản token cũ trước khi ghi mới
-      localStorage.removeItem('access_token');
-      sessionStorage.removeItem('access_token');
+      // Luôn lưu token vào localStorage để duy trì đăng nhập qua các tab
+      localStorage.setItem('access_token', res.token);
 
-      // Đã sửa lại thành res.token theo chuẩn Backend mới
+      // "Ghi nhớ tôi" chỉ để lưu/xóa email đã nhập
       if (rememberMe) {
-        localStorage.setItem('access_token', res.token);
         localStorage.setItem('remembered_email', email);
       } else {
-        sessionStorage.setItem('access_token', res.token);
         localStorage.removeItem('remembered_email');
       }
       message.success('Đăng nhập thành công! Xin chào ' + (res.user?.fullName || res.user?.username));

@@ -245,4 +245,30 @@ export const adminController = {
       return success(res, null, 'Xóa banner thành công');
     } catch (err) { return error(res, 'Lỗi xóa banner', 500); }
   },
+
+  // --- DẢI SẢN PHẨM TRANG CHỦ ---
+  getDaiSanPham: async (req: Request, res: Response) => {
+    try {
+      const list = await adminService.getDaiSanPham();
+      return success(res, { daiSanPham: list }, 'Danh sách dải sản phẩm');
+    } catch (err) { return error(res, 'Lỗi lấy dải sản phẩm', 500); }
+  },
+  createDaiSanPham: async (req: Request, res: Response) => {
+    try {
+      const created = await adminService.createDaiSanPham(req.body);
+      return success(res, { daiSanPham: created }, 'Tạo dải sản phẩm thành công');
+    } catch (err) { return error(res, 'Lỗi tạo dải', 500); }
+  },
+  updateDaiSanPham: async (req: Request, res: Response) => {
+    try {
+      await adminService.updateDaiSanPham(Number(req.params.id), req.body);
+      return success(res, null, 'Cập nhật dải sản phẩm thành công');
+    } catch (err) { return error(res, 'Lỗi cập nhật', 500); }
+  },
+  deleteDaiSanPham: async (req: Request, res: Response) => {
+    try {
+      await adminService.deleteDaiSanPham(Number(req.params.id));
+      return success(res, null, 'Xóa dải sản phẩm thành công');
+    } catch (err) { return error(res, 'Lỗi xóa', 500); }
+  },
 };

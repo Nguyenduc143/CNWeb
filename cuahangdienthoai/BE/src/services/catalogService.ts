@@ -86,5 +86,11 @@ export const catalogService = {
     product.Images = imagesInfo; // Nhồi thêm mảng ảnh vào json
 
     return product;
+  },
+
+  getDaiSanPhamActive: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().execute('sp_GetDaiSanPhamActive');
+    return result.recordset;
   }
 };

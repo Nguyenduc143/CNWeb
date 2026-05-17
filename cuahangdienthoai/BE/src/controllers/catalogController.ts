@@ -91,3 +91,13 @@ export const getProductBySlug = async (req: Request, res: Response) => {
     return error(res, 'Gặp sự cố khi lấy chi tiết Sản phẩm', 500);
   }
 };
+
+export const getDaiSanPhamActive = async (req: Request, res: Response) => {
+  try {
+    const list = await catalogService.getDaiSanPhamActive();
+    return success(res, { daiSanPham: list }, 'Dải sản phẩm trang chủ');
+  } catch (err: any) {
+    console.error('Lỗi Catalog Controller (DaiSanPham):', err);
+    return error(res, 'Gặp sự cố khi lấy dải sản phẩm', 500);
+  }
+};

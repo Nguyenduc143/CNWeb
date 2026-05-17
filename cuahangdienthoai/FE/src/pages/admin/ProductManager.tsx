@@ -32,7 +32,7 @@ const ProductManager: React.FC = () => {
     }
     setLoading(false);
   };
-
+  // set trạng thái modal khi thêm sản phẩm mới
   const handleAdd = () => {
     setEditingId(null);
     form.resetFields();

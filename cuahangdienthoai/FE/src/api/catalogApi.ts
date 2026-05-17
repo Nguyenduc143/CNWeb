@@ -15,6 +15,9 @@ const catalogApi = {
   },
   getActiveFlashSale: () => {
     return axiosClient.get('/flash-sale');
+  },
+  getDaiSanPham: () => {
+    return axiosClient.get('/dai-san-pham');
   }
 };
 

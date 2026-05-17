@@ -108,6 +108,19 @@ const adminApi = {
   deleteBanner: (id: number) => {
     return axiosClient.delete(`/admin/banners/${id}`);
   },
+  // --- Dải Sản Phẩm Trang Chủ ---
+  getDaiSanPham: () => {
+    return axiosClient.get('/admin/dai-san-pham');
+  },
+  createDaiSanPham: (data: any) => {
+    return axiosClient.post('/admin/dai-san-pham', data);
+  },
+  updateDaiSanPham: (id: number, data: any) => {
+    return axiosClient.put(`/admin/dai-san-pham/${id}`, data);
+  },
+  deleteDaiSanPham: (id: number) => {
+    return axiosClient.delete(`/admin/dai-san-pham/${id}`);
+  },
 };
 
 export default adminApi;

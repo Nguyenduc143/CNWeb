@@ -322,4 +322,43 @@ export const adminService = {
       .query('DELETE FROM Banner WHERE MaBanner = @Id');
     return true;
   },
+
+  // --- QUẢN LÝ DẢI SẢN PHẨM TRANG CHỦ ---
+  getDaiSanPham: async () => {
+    const pool = await getConnection();
+    const result = await pool.request().execute('sp_Admin_GetDaiSanPham');
+    return result.recordset;
+  },
+  createDaiSanPham: async (data: any) => {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('TieuDe', sql.NVarChar, data.tieuDe)
+      .input('MaThuongHieu', sql.Int, data.maThuongHieu)
+      .input('Icon', sql.NVarChar, data.icon || 'phone-portrait-outline')
+      .input('DuongDanXemTat', sql.NVarChar, data.duongDanXemTat || '/products')
+      .input('SoSanPhamHienThi', sql.Int, data.soSanPhamHienThi || 4)
+      .input('ThuTu', sql.Int, data.thuTu || 99)
+      .input('DangHoatDong', sql.Bit, data.dangHoatDong !== false ? 1 : 0)
+      .execute('sp_Admin_CreateDaiSanPham');
+    return result.recordset[0];
+  },
+  updateDaiSanPham: async (id: number, data: any) => {
+    const pool = await getConnection();
+    await pool.request()
+      .input('Id', sql.Int, id)
+      .input('TieuDe', sql.NVarChar, data.tieuDe)
+      .input('MaThuongHieu', sql.Int, data.maThuongHieu)
+      .input('Icon', sql.NVarChar, data.icon || 'phone-portrait-outline')
+      .input('DuongDanXemTat', sql.NVarChar, data.duongDanXemTat || '/products')
+      .input('SoSanPhamHienThi', sql.Int, data.soSanPhamHienThi || 4)
+      .input('ThuTu', sql.Int, data.thuTu || 99)
+      .input('DangHoatDong', sql.Bit, data.dangHoatDong ? 1 : 0)
+      .execute('sp_Admin_UpdateDaiSanPham');
+    return true;
+  },
+  deleteDaiSanPham: async (id: number) => {
+    const pool = await getConnection();
+    await pool.request().input('Id', sql.Int, id).execute('sp_Admin_DeleteDaiSanPham');
+    return true;
+  },
 };

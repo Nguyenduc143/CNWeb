@@ -80,7 +80,7 @@ const HeroBanner: React.FC = () => {
 
   // Fetch từ API, nếu lỗi dùng fallback sẵn
   useEffect(() => {
-    axiosClient.get('/catalog/banners')
+    axiosClient.get('/banners')
       .then((res: any) => {
         const data = res?.data?.banners ?? res?.banners ?? null;
         if (Array.isArray(data) && data.length > 0) {
