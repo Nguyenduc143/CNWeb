@@ -12,7 +12,7 @@ interface ProductListPageProps {
 
 const ProductListPage: React.FC<ProductListPageProps> = ({ title: propTitle, icon, brandId }) => {
   const { id } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   
   const keyword = searchParams.get('keyword') || undefined;
   const categoryId = id ? parseInt(id, 10) : undefined;
@@ -52,6 +52,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({ title: propTitle, ico
 
   useEffect(() => {
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brandId, categoryId, keyword, page, sortBy, minPrice, maxPrice]);
 
   const fetchProducts = () => {

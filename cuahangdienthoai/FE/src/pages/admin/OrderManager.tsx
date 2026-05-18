@@ -1,3 +1,6 @@
+// ============================================================
+// FILE: OrderManager.tsx - QUẢN LÝ ĐƠN HÀNG (ADMIN)
+
 import React, { useEffect, useState } from 'react';
 import { Table, Select, message, Tag } from 'antd';
 import adminApi from '../../api/adminApi';
@@ -9,6 +12,9 @@ const OrderManager: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // ----------------------------------------------------------
+  // Tải danh sách đơn hàng từ BE
+  // ----------------------------------------------------------
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -25,6 +31,9 @@ const OrderManager: React.FC = () => {
     fetchOrders();
   }, []);
 
+  // ----------------------------------------------------------
+  // Đổi trạng thái đơn - gọi API và reload
+  // ----------------------------------------------------------
   const handleStatusChange = async (orderId: string, value: number) => {
     try {
       await adminApi.updateOrderStatus(orderId, value);
@@ -35,23 +44,21 @@ const OrderManager: React.FC = () => {
     }
   };
 
-  const statusMap: any = {
-    0: { text: 'Chờ Xử Lý', color: 'orange' },
-    1: { text: 'Đang Giao', color: 'blue' },
-    2: { text: 'Hoàn Tất', color: 'green' },
-    3: { text: 'Đã Hủy', color: 'red' },
-  };
-
+  // ----------------------------------------------------------
+  // CẤU HÌNH CỘT BẢNG
+  // ----------------------------------------------------------
   const columns = [
     {
       title: 'Mã Đơn',
       dataIndex: 'OrderId',
       key: 'OrderId',
+      // GUID rất dài -> chỉ hiển thị 8 ký tự đầu cho gọn
       render: (text: string) => <span style={{ fontFamily: 'monospace' }}>{text.split('-')[0]}</span>,
     },
     {
       title: 'Khách Hàng',
       key: 'Customer',
+      // Render 2 dòng: tên + email
       render: (_: any, record: any) => (
         <div>
           <strong>{record.CustomerName || record.Phone}</strong>
@@ -59,16 +66,12 @@ const OrderManager: React.FC = () => {
         </div>
       )
     },
-    {
-      title: 'Địa Chỉ Giao',
-      dataIndex: 'Address',
-      key: 'Address',
-      width: 250,
-    },
+    { title: 'Địa Chỉ Giao', dataIndex: 'Address', key: 'Address', width: 250 },
     {
       title: 'Tổng Giá Trị',
       dataIndex: 'Total',
       key: 'Total',
+      // Format số -> tiền VNĐ (123,456,789 ₫)
       render: (val: number) => <strong>{val?.toLocaleString('vi-VN')} ₫</strong>,
     },
     {
@@ -81,25 +84,20 @@ const OrderManager: React.FC = () => {
       title: 'Trạng Thái',
       key: 'Status',
       width: 150,
+      // Dropdown đổi trạng thái ngay trên row
       render: (_: any, record: any) => (
-        <Select 
-          value={record.Status} 
+        <Select
+          value={record.Status}
           style={{ width: '100%' }}
           onChange={(val) => handleStatusChange(record.OrderId, val)}
-          disabled={record.Status === 3 || record.Status === 2} // Không sửa nếu Đã Hủy hoặc Đã Hoàn Tất
+          // Khoá dropdown nếu đơn đã KẾT THÚC (Hủy hoặc Hoàn Tất)
+          // -> tránh sửa nhầm trạng thái cuối
+          disabled={record.Status === 3 || record.Status === 2}
         >
-          <Option value={0}>
-            <Tag color="orange">Chờ Xử Lý</Tag>
-          </Option>
-          <Option value={1}>
-            <Tag color="blue">Đang Giao</Tag>
-          </Option>
-          <Option value={2}>
-            <Tag color="green">Hoàn Tất</Tag>
-          </Option>
-          <Option value={3}>
-            <Tag color="red">Đã Hủy</Tag>
-          </Option>
+          <Option value={0}><Tag color="orange">Chờ Xử Lý</Tag></Option>
+          <Option value={1}><Tag color="blue">Đang Giao</Tag></Option>
+          <Option value={2}><Tag color="green">Hoàn Tất</Tag></Option>
+          <Option value={3}><Tag color="red">Đã Hủy</Tag></Option>
         </Select>
       )
     }
@@ -110,10 +108,10 @@ const OrderManager: React.FC = () => {
       <div className="admin-page-header">
         <h2>Quản Lý Đơn Hàng (Orders)</h2>
       </div>
-      <Table 
-        columns={columns} 
-        dataSource={orders} 
-        rowKey="OrderId" 
+      <Table
+        columns={columns}
+        dataSource={orders}
+        rowKey="OrderId"
         loading={loading}
         bordered
         pagination={{ pageSize: 10 }}

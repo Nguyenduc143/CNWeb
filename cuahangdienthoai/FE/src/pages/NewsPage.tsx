@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import newsApi from '../api/newsApi';
 import '../assets/News.css';
 

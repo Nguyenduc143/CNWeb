@@ -1,10 +1,14 @@
+// FILE: adminApi.ts - WRAPPER API CHO TOÀN BỘ ADMIN CMS
+
 import axiosClient from './axiosClient';
 
 const adminApi = {
+  // ----- Dashboard thống kê -----
   getDashboardStats: () => {
     return axiosClient.get('/admin/dashboard/stats');
   },
-  // --- Danh Mục ---
+
+  // ----- Danh Mục (CRUD) -----
   getCategories: () => {
     return axiosClient.get('/admin/categories');
   },
@@ -17,7 +21,8 @@ const adminApi = {
   deleteCategory: (id: number) => {
     return axiosClient.delete(`/admin/categories/${id}`);
   },
-  // --- Thương Hiệu ---
+
+  // ----- Thương Hiệu (CRUD) -----
   getBrands: () => {
     return axiosClient.get('/admin/brands');
   },
@@ -30,14 +35,16 @@ const adminApi = {
   deleteBrand: (id: number) => {
     return axiosClient.delete(`/admin/brands/${id}`);
   },
-  // --- Đơn Hàng ---
+
+  // ----- Đơn Hàng (chỉ xem + đổi trạng thái) -----
   getOrders: () => {
     return axiosClient.get('/admin/orders');
   },
   updateOrderStatus: (id: string, status: number) => {
     return axiosClient.put(`/admin/orders/${id}/status`, { status });
   },
-  // --- Thành Viên ---
+
+  // ----- Thành Viên -----
   getUsers: () => {
     return axiosClient.get('/admin/users');
   },
@@ -47,7 +54,8 @@ const adminApi = {
   changeUserRole: (id: string, role: string) => {
     return axiosClient.put(`/admin/users/${id}/role`, { role });
   },
-  // --- Sản Phẩm ---
+
+  // ----- Sản Phẩm (CRUD) -----
   getProducts: () => {
     return axiosClient.get('/admin/products');
   },
@@ -60,7 +68,8 @@ const adminApi = {
   deleteProduct: (id: string) => {
     return axiosClient.delete(`/admin/products/${id}`);
   },
-  // --- Flash Sale ---
+
+  // ----- Flash Sale (sự kiện + sản phẩm tham gia) -----
   getFlashSales: () => {
     return axiosClient.get('/admin/flash-sales');
   },
@@ -76,13 +85,15 @@ const adminApi = {
   deleteFlashSale: (id: number) => {
     return axiosClient.delete(`/admin/flash-sales/${id}`);
   },
+  // Thêm 1 sản phẩm vào sự kiện flash sale (kèm giá ưu đãi)
   addFlashSaleItem: (data: any) => {
     return axiosClient.post('/admin/flash-sales/items', data);
   },
   removeFlashSaleItem: (itemId: number) => {
     return axiosClient.delete(`/admin/flash-sales/items/${itemId}`);
   },
-  // --- Tin Tức ---
+
+  // ----- Tin Tức (CRUD) -----
   getNews: () => {
     return axiosClient.get('/admin/news');
   },
@@ -95,7 +106,8 @@ const adminApi = {
   deleteNews: (id: number) => {
     return axiosClient.delete(`/admin/news/${id}`);
   },
-  // --- Banner ---
+
+  // ----- Banner (CRUD) -----
   getBanners: () => {
     return axiosClient.get('/admin/banners');
   },
@@ -108,7 +120,8 @@ const adminApi = {
   deleteBanner: (id: number) => {
     return axiosClient.delete(`/admin/banners/${id}`);
   },
-  // --- Dải Sản Phẩm Trang Chủ ---
+
+  // ----- Dải Sản Phẩm Trang Chủ (CRUD) -----
   getDaiSanPham: () => {
     return axiosClient.get('/admin/dai-san-pham');
   },

@@ -1,9 +1,14 @@
+
+
 import { Request, Response } from 'express';
 import { adminService } from '../services/adminService';
 import { success, error } from '../utils/response';
 
 export const adminController = {
-  // Thống kê Dashboard
+
+  // 1. DASHBOARD - THỐNG KÊ TỔNG QUAN
+ 
+  // Trả về: tổng đơn, tổng doanh thu, sản phẩm bán chạy, biểu đồ doanh thu...
   getDashboardStats: async (req: Request, res: Response) => {
     try {
       const stats = await adminService.getDashboardStats();
@@ -13,7 +18,9 @@ export const adminController = {
     }
   },
 
-  // --- Danh mục CRUD ---
+ 
+  // 2. DANH MỤC SẢN PHẨM - CRUD
+  
   getCategories: async (req: Request, res: Response) => {
     try {
       const cates = await adminService.getCategories();
@@ -28,6 +35,7 @@ export const adminController = {
   },
   updateCategory: async (req: Request, res: Response) => {
     try {
+      // req.params.id là string -> convert sang Number
       await adminService.updateCategory(Number(req.params.id), req.body);
       return success(res, null, 'Cập nhật xong');
     } catch (err) { return error(res, 'Lỗi', 500); }
@@ -36,10 +44,15 @@ export const adminController = {
     try {
       await adminService.deleteCategory(Number(req.params.id));
       return success(res, null, 'Xóa danh mục xong');
-    } catch (err) { return error(res, 'Không thể xóa do bị ràng buộc', 400); }
+    } catch (err) {
+      // 400 vì đa phần lỗi xoá là do ràng buộc khoá ngoại (đang có SP thuộc danh mục)
+      return error(res, 'Không thể xóa do bị ràng buộc', 400);
+    }
   },
 
-  // --- Thương Hiệu ---
+  
+  // 3. THƯƠNG HIỆU (Apple, Samsung, Xiaomi...) - CRUD
+
   getBrands: async (req: Request, res: Response) => {
     try {
       const brands = await adminService.getBrands();
@@ -65,7 +78,11 @@ export const adminController = {
     } catch (err) { return error(res, 'Thương hiệu đang có sản phẩm. Không thể xóa', 400); }
   },
 
-  // --- Đơn hàng ---
+ 
+  // 4. ĐƠN HÀNG - Admin chỉ XEM và ĐỔI TRẠNG THÁI
+  
+  // Trạng thái đơn (Status): 0=Chờ xác nhận, 1=Đã xác nhận,
+  //                          2=Đang giao, 3=Hoàn thành, 4=Đã huỷ
   getAllOrders: async (req: Request, res: Response) => {
     try {
       const orders = await adminService.getAllOrders();
@@ -80,7 +97,10 @@ export const adminController = {
     } catch (err) { return error(res, 'Lỗi cập nhật', 500); }
   },
 
-  // --- Thành viên ---
+  
+  // 5. NGƯỜI DÙNG - Admin xem, KHOÁ và ĐỔI VAI TRÒ
+  
+  // Vai trò: Customer | Staff | Admin
   getAllUsers: async (req: Request, res: Response) => {
     try {
       const users = await adminService.getAllUsers();
@@ -91,6 +111,7 @@ export const adminController = {
     try {
       const { isLocked } = req.body;
       await adminService.toggleUserLock(req.params.id as string, isLocked);
+      // Message khác nhau tuỳ hành động (khoá hay mở khoá)
       return success(res, null, isLocked ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản');
     } catch (err) { return error(res, 'Lỗi thay đổi trạng thái', 500); }
   },
@@ -102,7 +123,10 @@ export const adminController = {
     } catch (err) { return error(res, 'Lỗi thay đổi quyền', 500); }
   },
 
-  // Lấy toàn bộ Sản Phẩm Grid
+ 
+  // 6. SẢN PHẨM (KHO HÀNG) - CRUD đầy đủ
+ 
+  // ID sản phẩm là UNIQUEIDENTIFIER (GUID) -> nhận dưới dạng string
   getAllProducts: async (req: Request, res: Response) => {
     try {
       const products = await adminService.getAllProducts();
@@ -112,7 +136,6 @@ export const adminController = {
     }
   },
 
-  // Tạo SP Mới
   createProduct: async (req: Request, res: Response) => {
     try {
       const newProd = await adminService.createProduct(req.body);
@@ -123,7 +146,6 @@ export const adminController = {
     }
   },
 
-  // Cập nhật SP
   updateProduct: async (req: Request, res: Response) => {
     try {
       const id = req.params.id as string;
@@ -136,7 +158,6 @@ export const adminController = {
     }
   },
 
-  // Xóa SP
   deleteProduct: async (req: Request, res: Response) => {
     try {
       const id = req.params.id as string;
@@ -144,11 +165,15 @@ export const adminController = {
       return success(res, null, 'Xóa vĩnh viễn sản phẩm thành công.');
     } catch (err) {
       console.error(err);
+      // Sản phẩm đã có trong đơn hàng/hoá đơn -> không xoá được do FK
       return error(res, 'Không thể xóa SP vì đang nằm trong khóa ngoại Hóa đơn.', 400);
     }
   },
 
-  // --- Flash Sale ---
+
+  // 7. FLASH SALE - 2 cấp: Sự kiện + Sản phẩm tham gia
+ 
+  // FlashSale (sự kiện)  --(1-N)-->  ChiTietFlashSale (SP tham gia)
   getFlashSales: async (req: Request, res: Response) => {
     try {
       const list = await adminService.getFlashSales();
@@ -157,6 +182,7 @@ export const adminController = {
   },
   getFlashSaleDetail: async (req: Request, res: Response) => {
     try {
+      // SP trả 2 recordset: thông tin sự kiện + danh sách sp tham gia
       const data = await adminService.getFlashSaleDetail(Number(req.params.id));
       if (!data) return error(res, 'Không tìm thấy', 404);
       return success(res, { flashSale: data.event, items: data.items }, 'Chi tiết Flash Sale');
@@ -180,9 +206,11 @@ export const adminController = {
       return success(res, null, 'Xóa Flash Sale thành công');
     } catch (err) { return error(res, 'Lỗi xóa', 500); }
   },
+  // Thêm 1 sản phẩm vào sự kiện flash sale (kèm giá và số lượng giới hạn)
   addFlashSaleItem: async (req: Request, res: Response) => {
     try {
       const result = await adminService.addFlashSaleItem(req.body);
+      // SP có thể trả Success=0 khi giá flash > giá bán, hoặc SP đã có trong FS khác đang chạy...
       if (result.Success === 0) return error(res, result.Message, 400);
       return success(res, { item: result }, 'Thêm sản phẩm vào Flash Sale thành công');
     } catch (err) { return error(res, 'Lỗi thêm sản phẩm', 500); }
@@ -194,7 +222,9 @@ export const adminController = {
     } catch (err) { return error(res, 'Lỗi xóa sản phẩm', 500); }
   },
 
-  // --- Tin Tức ---
+  
+  // 8. TIN TỨC (BLOG) - CRUD
+  
   getAllNews: async (req: Request, res: Response) => {
     try {
       const news = await adminService.getAllNews();
@@ -220,7 +250,9 @@ export const adminController = {
     } catch (err) { return error(res, 'Sự cố xóa dữ liệu', 500); }
   },
 
-  // --- BANNER ---
+  
+  // 9. BANNER (Slider hero trang chủ) - CRUD
+  
   getAllBanners: async (req: Request, res: Response) => {
     try {
       const banners = await adminService.getAllBanners();
@@ -246,7 +278,11 @@ export const adminController = {
     } catch (err) { return error(res, 'Lỗi xóa banner', 500); }
   },
 
-  // --- DẢI SẢN PHẨM TRANG CHỦ ---
+ 
+  // 10. DẢI SẢN PHẨM TRANG CHỦ - CRUD
+
+  // Mỗi "dải" = 1 row hiển thị nhóm SP cùng thương hiệu trên trang chủ
+  // (ví dụ: row "iPhone nổi bật", row "Samsung Galaxy"...)
   getDaiSanPham: async (req: Request, res: Response) => {
     try {
       const list = await adminService.getDaiSanPham();

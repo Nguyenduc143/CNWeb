@@ -1,9 +1,14 @@
+// ============================================================
+// FILE: NewsManager.tsx - QUẢN LÝ TIN TỨC (BLOG)
+
+
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Input, Switch, Space, Popconfirm, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import adminApi from '../../api/adminApi';
 
 const NewsManager: React.FC = () => {
+  // 4 state cơ bản
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,6 +19,7 @@ const NewsManager: React.FC = () => {
     fetchNews();
   }, []);
 
+  // Tải danh sách bài viết
   const fetchNews = async () => {
     setLoading(true);
     try {
@@ -25,6 +31,7 @@ const NewsManager: React.FC = () => {
     setLoading(false);
   };
 
+  // Mở modal THÊM MỚI - mặc định Trạng thái = Công khai
   const handleAdd = () => {
     setEditingId(null);
     form.resetFields();
@@ -32,7 +39,7 @@ const NewsManager: React.FC = () => {
     setIsModalOpen(true);
   };
 
-
+  // Mở modal SỬA - nạp data hiện tại
   const handleEdit = (record: any) => {
     setEditingId(record.MaTinTuc);
     form.setFieldsValue({
@@ -40,11 +47,13 @@ const NewsManager: React.FC = () => {
       TomTat: record.TomTat,
       NoiDung: record.NoiDung,
       HinhThuNho: record.HinhThuNho,
+      // Chuẩn hoá Bit 0/1 hoặc boolean -> boolean cho Switch
       TrangThai: record.TrangThai === true || record.TrangThai === 1,
     });
     setIsModalOpen(true);
   };
 
+  // Xoá bài viết
   const handleDelete = async (id: number) => {
     try {
       await adminApi.deleteNews(id);
@@ -55,8 +64,10 @@ const NewsManager: React.FC = () => {
     }
   };
 
+  // Lưu form (Thêm/Sửa)
   const handleSave = async (values: any) => {
     try {
+      // Convert boolean của Switch -> Bit 0/1 cho SQL
       const payload = { ...values, TrangThai: values.TrangThai ? 1 : 0 };
       if (editingId) {
         await adminApi.updateNews(editingId, payload);
@@ -72,12 +83,16 @@ const NewsManager: React.FC = () => {
     }
   };
 
+  // Cấu hình bảng
   const columns = [
     {
       title: 'Hình Ảnh',
       dataIndex: 'HinhThuNho',
       key: 'HinhThuNho',
-      render: (img: string) => img ? <img src={img} alt="thumb" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: '4px' }} /> : <span>---</span>
+      // Show ảnh thumbnail nhỏ nếu có
+      render: (img: string) => img
+        ? <img src={img} alt="thumb" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: '4px' }} />
+        : <span>---</span>
     },
     {
       title: 'Tiêu Đề Bài Viết',
@@ -90,7 +105,12 @@ const NewsManager: React.FC = () => {
       dataIndex: 'TomTat',
       key: 'TomTat',
       width: 300,
-      render: (text: string) => <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px', fontSize: '13px' }}>{text}</div>
+      // CSS truncate text 1 dòng (có dấu ... nếu dài)
+      render: (text: string) => (
+        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px', fontSize: '13px' }}>
+          {text}
+        </div>
+      )
     },
     {
       title: 'Ngày Đăng',
@@ -102,6 +122,7 @@ const NewsManager: React.FC = () => {
       title: 'Trạng Thái',
       dataIndex: 'TrangThai',
       key: 'TrangThai',
+      // Switch read-only chỉ hiển thị, không bấm được trên bảng
       render: (status: any) => (
         <Switch checked={status === true || status === 1} disabled />
       )
@@ -138,6 +159,7 @@ const NewsManager: React.FC = () => {
         bordered
       />
 
+      {/* Modal CRUD Thêm/Sửa bài viết */}
       <Modal
         title={editingId ? "Biên Tập Tin Tức" : "Tạo Mới Bài Viết"}
         open={isModalOpen}
@@ -152,10 +174,12 @@ const NewsManager: React.FC = () => {
             <Input placeholder="Nhập tiêu đề thu hút người đọc..." />
           </Form.Item>
 
+          {/* Sapo = đoạn tóm tắt ngắn dưới tiêu đề bài báo */}
           <Form.Item name="TomTat" label="Đoạn tóm tắt (Sapo)">
             <Input.TextArea rows={2} placeholder="Vài dòng khái quát bài viết..." />
           </Form.Item>
 
+          {/* Nội dung đầy đủ - cho phép nhập HTML thô (rich text) */}
           <Form.Item name="NoiDung" label="Nội dung bài viết (Rich Text HTML)" rules={[{ required: true, message: 'Nhập nội dung' }]}>
             <Input.TextArea rows={6} placeholder="Gõ nội dung hoàn chỉnh hoặc mã HTML..." />
           </Form.Item>
@@ -164,6 +188,7 @@ const NewsManager: React.FC = () => {
             <Input placeholder="https://..." />
           </Form.Item>
 
+          {/* Switch chế độ Công khai / Bản nháp */}
           <Form.Item name="TrangThai" label="Trạng thái Đăng bài" valuePropName="checked">
             <Switch checkedChildren="Công Khai" unCheckedChildren="Bản Nháp" />
           </Form.Item>

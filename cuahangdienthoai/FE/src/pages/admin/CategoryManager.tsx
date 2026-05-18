@@ -1,3 +1,7 @@
+// ============================================================
+// FILE: CategoryManager.tsx - QUẢN LÝ DANH MỤC SẢN PHẨM
+
+
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Input, message, Space, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -5,17 +9,20 @@ import adminApi from '../../api/adminApi';
 import '../../assets/Admin.css';
 
 const CategoryManager: React.FC = () => {
+  // 4 state cơ bản của 1 trang CRUD
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  
+
   const [form] = Form.useForm();
 
+  // Tải danh mục từ BE
   const fetchCategories = async () => {
     setLoading(true);
     try {
       const res: any = await adminApi.getCategories();
+      // Fallback đa schema response
       setCategories(res.data?.categories || res.categories || []);
     } catch (err) {
       message.error('Lỗi khi tải danh mục');
@@ -28,17 +35,21 @@ const CategoryManager: React.FC = () => {
     fetchCategories();
   }, []);
 
+  // Mở modal cho cả Thêm/Sửa
   const handleOpenModal = (record?: any) => {
     if (record) {
+      // Sửa: nạp ID và name vào form
       setEditingId(record.CategoryId);
       form.setFieldsValue({ name: record.Name });
     } else {
+      // Thêm: clear form
       setEditingId(null);
       form.resetFields();
     }
     setIsModalVisible(true);
   };
 
+  // Submit form (thêm hoặc sửa, phân biệt qua editingId)
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
@@ -55,6 +66,7 @@ const CategoryManager: React.FC = () => {
     }
   };
 
+  // Xoá danh mục - BE chặn nếu có sản phẩm/ảnh tham chiếu
   const handleDelete = async (id: number) => {
     try {
       await adminApi.deleteCategory(id);
@@ -65,24 +77,16 @@ const CategoryManager: React.FC = () => {
     }
   };
 
+  // Cấu hình bảng (4 cột: ID, Name, Slug, Action)
   const columns = [
-    {
-      title: 'Mã số',
-      dataIndex: 'CategoryId',
-      key: 'CategoryId',
-      width: 100,
-    },
+    { title: 'Mã số', dataIndex: 'CategoryId', key: 'CategoryId', width: 100 },
     {
       title: 'Tên Danh Mục',
       dataIndex: 'Name',
       key: 'Name',
       render: (text: string) => <strong>{text}</strong>,
     },
-    {
-      title: 'Đường dẫn URL (Slug)',
-      dataIndex: 'Slug',
-      key: 'Slug',
-    },
+    { title: 'Đường dẫn URL (Slug)', dataIndex: 'Slug', key: 'Slug' },
     {
       title: 'Hành động',
       key: 'action',
@@ -94,8 +98,7 @@ const CategoryManager: React.FC = () => {
             title="Xóa danh mục này?"
             description="Chú ý: Sẽ lỗi nếu bạn chưa xóa hết Sản phẩm và Hình ảnh bên trong!"
             onConfirm={() => handleDelete(record.CategoryId)}
-            okText="Xóa luôn"
-            cancelText="Hủy"
+            okText="Xóa luôn" cancelText="Hủy"
             okButtonProps={{ danger: true }}
           >
             <Button type="primary" danger icon={<DeleteOutlined />} size="small" />
@@ -109,9 +112,9 @@ const CategoryManager: React.FC = () => {
     <div className="admin-page-container">
       <div className="admin-page-header">
         <h2>Quản Lý Danh Mục (Categories)</h2>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
           size="large"
           onClick={() => handleOpenModal()}
           style={{ borderRadius: 8 }}
@@ -120,10 +123,10 @@ const CategoryManager: React.FC = () => {
         </Button>
       </div>
 
-      <Table 
-        columns={columns} 
-        dataSource={categories} 
-        rowKey="CategoryId" 
+      <Table
+        columns={columns}
+        dataSource={categories}
+        rowKey="CategoryId"
         loading={loading}
         bordered
         pagination={{ pageSize: 10 }}
@@ -139,9 +142,9 @@ const CategoryManager: React.FC = () => {
         cancelText="Hủy Bỏ"
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
-          <Form.Item 
-            name="name" 
-            label="Tên Danh Mục" 
+          <Form.Item
+            name="name"
+            label="Tên Danh Mục"
             rules={[{ required: true, message: 'Vui lòng nhập tên danh mục!' }]}
           >
             <Input placeholder="Ví dụ: Phụ kiện Điện thoại..." size="large" />

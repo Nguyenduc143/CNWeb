@@ -28,6 +28,7 @@ const CheckoutPage: React.FC = () => {
         message.error('Bạn cần đăng nhập để thanh toán');
         navigate('/login');
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAddresses = async () => {
@@ -159,7 +160,7 @@ const CheckoutPage: React.FC = () => {
             <button className="btn-place-order" onClick={handlePlaceOrder}>
               ĐẶT HÀNG NGAY
             </button>
-            <p className="checkout-policy">Bằng việc Đặt hàng, bạn đồng ý với các <a>Điều khoản quy định</a> của chúng tôi.</p>
+            <p className="checkout-policy">Bằng việc Đặt hàng, bạn đồng ý với các <a href="/dieu-khoan">Điều khoản quy định</a> của chúng tôi.</p>
           </div>
         </aside>
       </div>

@@ -1,24 +1,41 @@
+
+
 import { Router } from 'express';
-import { getCategories, getBrands, getProducts, getProductBySlug, getActiveFlashSale, getBanners, getDaiSanPhamActive } from '../controllers/catalogController';
+import {
+  getCategories, getBrands, getProducts, getProductBySlug,
+  getActiveFlashSale, getBanners, getDaiSanPhamActive
+} from '../controllers/catalogController';
 import { getNewsList, getNewsDetail } from '../controllers/newsController';
 
 const router = Router();
 
-// Mảng API Public (Catalog Storefront) - Không cần chặn Auth Middleware
-router.get('/categories', getCategories);
-router.get('/brands', getBrands);
-router.get('/banners', getBanners);
+
+// 1) DANH MỤC, THƯƠNG HIỆU, BANNER (cố định)
+
+router.get('/categories', getCategories);  // GET /api/categories
+router.get('/brands', getBrands);          // GET /api/brands
+router.get('/banners', getBanners);        // GET /api/banners (banner đang bật)
+
+
+// 2) SẢN PHẨM
+
+// Hỗ trợ query params: ?page=1&pageSize=12&keyword=&categoryId=&brandId=
+//                      &minPrice=&maxPrice=&sortBy=
 router.get('/products', getProducts);
+
+// Chi tiết 1 sản phẩm theo slug (ví dụ: /api/products/iphone-15-pro-max)
 router.get('/products/:slug', getProductBySlug);
 
-// Flash Sale
-router.get('/flash-sale', getActiveFlashSale);
 
-// Dải Sản Phẩm Trang Chủ
-router.get('/dai-san-pham', getDaiSanPhamActive);
+// 3) FLASH SALE & DẢI SẢN PHẨM TRANG CHỦ
 
-// News
-router.get('/news', getNewsList);
-router.get('/news/:id', getNewsDetail);
+router.get('/flash-sale', getActiveFlashSale);   // Flash sale đang diễn ra
+router.get('/dai-san-pham', getDaiSanPhamActive); // Các "row" sản phẩm theo brand
+
+
+// 4) TIN TỨC
+
+router.get('/news', getNewsList);        // Danh sách bài viết
+router.get('/news/:id', getNewsDetail);  // Chi tiết theo ID
 
 export default router;

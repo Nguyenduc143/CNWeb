@@ -1,7 +1,20 @@
+// ============================================================
+// FILE: catalogController.ts - CONTROLLER CHO API STOREFRONT
+// ------------------------------------------------------------
+// Phụ trách các API CÔNG KHAI (không cần đăng nhập):
+//   - Danh mục, thương hiệu, banner
+//   - Sản phẩm (list có filter, chi tiết theo slug)
+//   - Flash sale đang chạy
+//   - Dải sản phẩm trang chủ
+// ============================================================
+
 import { Request, Response } from 'express';
 import { catalogService } from '../services/catalogService';
 import { success, error } from '../utils/response';
 
+// ------------------------------------------------------------
+// GET /api/categories - Danh sách danh mục
+// ------------------------------------------------------------
 export const getCategories = async (req: Request, res: Response) => {
   try {
     const categories = await catalogService.getCategories();
@@ -12,6 +25,9 @@ export const getCategories = async (req: Request, res: Response) => {
   }
 };
 
+// ------------------------------------------------------------
+// GET /api/brands - Danh sách thương hiệu
+// ------------------------------------------------------------
 export const getBrands = async (req: Request, res: Response) => {
   try {
     const brands = await catalogService.getBrands();
@@ -22,9 +38,18 @@ export const getBrands = async (req: Request, res: Response) => {
   }
 };
 
+// ------------------------------------------------------------
+// GET /api/products - Lọc + phân trang sản phẩm
+// ------------------------------------------------------------
+// Hỗ trợ query params:
+//   page=1, pageSize=12, keyword=iphone, categoryId=1, brandId=2,
+//   minPrice=5000000, maxPrice=20000000, sortBy=price-asc
+//
+// Response: { products: [...], pagination: { page, pageSize, totalCount, totalPages } }
+// ------------------------------------------------------------
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    // Parse query params từ FE (phân trang, search...)
+    // Parse các query params từ URL (đều là string -> cần ép kiểu phù hợp)
     const { page, pageSize, keyword, categoryId, brandId, minPrice, maxPrice, sortBy } = req.query;
 
     const data = await catalogService.getProducts({
@@ -38,7 +63,8 @@ export const getProducts = async (req: Request, res: Response) => {
       sortBy: sortBy as string
     });
 
-    return success(res, { 
+    // Tính tổng số trang để FE hiển thị bộ phân trang
+    return success(res, {
         products: data.products,
         pagination: {
             page: page ? parseInt(page as string) : 1,
@@ -53,10 +79,15 @@ export const getProducts = async (req: Request, res: Response) => {
   }
 };
 
+// ------------------------------------------------------------
+// GET /api/flash-sale - Lấy flash sale đang chạy
+// Trả về null nếu không có sự kiện nào đang diễn ra
+// ------------------------------------------------------------
 export const getActiveFlashSale = async (req: Request, res: Response) => {
   try {
     const data = await catalogService.getActiveFlashSale();
     if (!data) {
+      // Vẫn trả 200 OK + flashSale: null thay vì lỗi -> FE dễ xử lý hơn
       return success(res, { flashSale: null }, 'Hiện không có Flash Sale nào đang diễn ra');
     }
     return success(res, { flashSale: data.event, items: data.items }, 'Flash Sale đang diễn ra');
@@ -66,6 +97,9 @@ export const getActiveFlashSale = async (req: Request, res: Response) => {
   }
 };
 
+// ------------------------------------------------------------
+// GET /api/banners - Danh sách banner cho slider trang chủ
+// ------------------------------------------------------------
 export const getBanners = async (req: Request, res: Response) => {
   try {
     const banners = await catalogService.getBanners();
@@ -76,6 +110,11 @@ export const getBanners = async (req: Request, res: Response) => {
   }
 };
 
+// ------------------------------------------------------------
+// GET /api/products/:slug - Chi tiết sản phẩm theo slug
+// Slug = chuỗi URL-friendly, ví dụ: "iphone-15-pro-max-256gb"
+// SEO-friendly hơn ID số, dễ nhớ hơn cho user
+// ------------------------------------------------------------
 export const getProductBySlug = async (req: Request, res: Response) => {
   try {
     const slug = req.params.slug as string;
@@ -92,6 +131,10 @@ export const getProductBySlug = async (req: Request, res: Response) => {
   }
 };
 
+// ------------------------------------------------------------
+// GET /api/dai-san-pham - Các "row" sản phẩm theo brand cho trang chủ
+// Ví dụ: Row "iPhone nổi bật", Row "Samsung Galaxy", ...
+// ------------------------------------------------------------
 export const getDaiSanPhamActive = async (req: Request, res: Response) => {
   try {
     const list = await catalogService.getDaiSanPhamActive();

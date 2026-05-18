@@ -1,21 +1,30 @@
+// ============================================================
+// FILE: ProductManager.tsx - QUẢN LÝ KHO HÀNG (SẢN PHẨM)
+
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Input, InputNumber, Space, Popconfirm, Select, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import adminApi from '../../api/adminApi';
 
 const ProductManager: React.FC = () => {
+  // ---- STATE ----
   const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [brands, setBrands] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);   // Cho dropdown chọn danh mục
+  const [brands, setBrands] = useState<any[]>([]);            // Cho dropdown chọn thương hiệu
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);  // GUID nên dùng string
   const [form] = Form.useForm();
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  // ----------------------------------------------------------
+  // Tải đồng thời 3 API: products + categories + brands
+  // -> Promise.all giúp đợi tất cả trả về cùng lúc, nhanh hơn nhiều
+  //    so với gọi tuần tự (~3 lần thời gian phản hồi)
+  // ----------------------------------------------------------
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -32,13 +41,15 @@ const ProductManager: React.FC = () => {
     }
     setLoading(false);
   };
-  // set trạng thái modal khi thêm sản phẩm mới
+
+  // Mở modal THÊM MỚI: clear form
   const handleAdd = () => {
     setEditingId(null);
     form.resetFields();
     setIsModalOpen(true);
   };
 
+  // Mở modal SỬA: nạp toàn bộ data của sản phẩm
   const handleEdit = (record: any) => {
     setEditingId(record.ProductId);
     form.setFieldsValue({
@@ -57,6 +68,7 @@ const ProductManager: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  // Xoá - BE chặn nếu sản phẩm đã có trong đơn/hoá đơn (FK)
   const handleDelete = async (id: string) => {
     try {
       await adminApi.deleteProduct(id);
@@ -67,6 +79,7 @@ const ProductManager: React.FC = () => {
     }
   };
 
+  // Lưu form (THÊM/SỬA)
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
@@ -83,11 +96,13 @@ const ProductManager: React.FC = () => {
     }
   };
 
+  // Cấu hình bảng (giữ tối giản: 4 cột)
   const columns = [
     {
       title: 'Tên Sản Phẩm',
       dataIndex: 'Name',
       key: 'Name',
+      // Hiện thumbnail + tên cùng 1 ô
       render: (text: string, record: any) => (
         <Space>
           {record.Image1 && <img src={record.Image1} alt="thumb" style={{width: 30, height: 30, objectFit: 'cover'}}/>}
@@ -105,6 +120,7 @@ const ProductManager: React.FC = () => {
       title: 'Tồn Kho',
       dataIndex: 'Stock',
       key: 'Stock',
+      // Tồn kho > 0 thì xanh (còn hàng), = 0 thì đỏ (hết hàng)
       render: (val: number) => <span style={{ color: val > 0 ? '#52c41a' : '#f5222d' }}>{val}</span>
     },
     {
@@ -130,14 +146,17 @@ const ProductManager: React.FC = () => {
         </Button>
       </div>
 
-      <Table 
-        columns={columns} 
-        dataSource={products} 
-        rowKey="ProductId" 
+      <Table
+        columns={columns}
+        dataSource={products}
+        rowKey="ProductId"
         loading={loading}
         pagination={{ pageSize: 12 }}
       />
 
+      {/* ===========================================================
+          MODAL THÊM/SỬA SẢN PHẨM (form lớn nhiều trường)
+          =========================================================== */}
       <Modal
         title={editingId ? "Sửa Sản Phẩm" : "Thêm Đặc Tả Sản Phẩm"}
         open={isModalOpen}
@@ -148,13 +167,16 @@ const ProductManager: React.FC = () => {
         cancelText="Hủy Bỏ"
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
+          {/* Tên sản phẩm */}
           <Form.Item name="name" label="Tên điện thoại" rules={[{ required: true, message: 'Nhập tên sản phẩm' }]}>
             <Input placeholder="Ví dụ: iPhone 15 Pro Max 256GB" />
           </Form.Item>
 
+          {/* Hàng ngang: Danh mục + Thương hiệu (cả 2 đều dropdown) */}
           <Space style={{ display: 'flex', marginBottom: 8 }} align="baseline">
             <Form.Item name="categoryId" label="Danh Mục" rules={[{ required: true, message: 'Vui lòng chọnDanh Mục!' }]}>
               <Select placeholder="Chọn Danh Mục" style={{ width: 180 }}>
+                {/* Map mảng categories -> các Option để chọn */}
                 {categories.map((c: any) => (
                   <Select.Option key={c.CategoryId} value={c.CategoryId}>{c.Name}</Select.Option>
                 ))}
@@ -163,6 +185,7 @@ const ProductManager: React.FC = () => {
             <Form.Item name="brandId" label="Thương Hiệu" rules={[{ required: true, message: 'Vui lòng chọn Hãng!' }]}>
               <Select placeholder="Chọn Thương Hiệu" style={{ width: 180 }}>
                 {brands.map((b: any) => (
+                  // Fallback đa schema (cũ: BrandId, mới: MaThuongHieu)
                   <Select.Option key={b.MaThuongHieu || b.BrandId} value={b.MaThuongHieu || b.BrandId}>
                     {b.Ten || b.Name}
                   </Select.Option>
@@ -171,8 +194,10 @@ const ProductManager: React.FC = () => {
             </Form.Item>
           </Space>
 
+          {/* Hàng ngang: Giá Nhập + Giá Bán + Tồn Kho */}
           <Space style={{ display: 'flex', marginBottom: 8 }} align="baseline">
             <Form.Item name="priceImport" label="Giá Nhập">
+              {/* formatter: thêm dấu phẩy mỗi 3 chữ số (1000 -> 1,000) */}
               <InputNumber style={{width: 200}} formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
             </Form.Item>
             <Form.Item name="priceSell" label="Giá Bán (Hiển thị Khách)" rules={[{ required: true }]}>
@@ -183,6 +208,7 @@ const ProductManager: React.FC = () => {
             </Form.Item>
           </Space>
 
+          {/* Hàng ngang: RAM + ROM + Màu sắc (thông số kỹ thuật) */}
           <Space style={{ display: 'flex', marginBottom: 8 }} align="baseline">
             <Form.Item name="ramGB" label="Dung lượng RAM (GB)">
               <InputNumber style={{width: 150}} />
@@ -195,10 +221,12 @@ const ProductManager: React.FC = () => {
             </Form.Item>
           </Space>
 
+          {/* Link ảnh chính */}
           <Form.Item name="image1" label="Link Ảnh (URL)">
             <Input placeholder="https://..." />
           </Form.Item>
 
+          {/* Mô tả dài */}
           <Form.Item name="description" label="Bài Viết Đánh Giá (Mô tả)">
             <Input.TextArea rows={4} />
           </Form.Item>

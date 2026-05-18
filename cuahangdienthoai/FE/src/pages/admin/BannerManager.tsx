@@ -1,3 +1,7 @@
+
+// FILE: BannerManager.tsx - QUẢN LÝ BANNER SLIDER TRANG CHỦ
+
+
 import React, { useEffect, useState } from 'react';
 import {
   Table, Button, Modal, Form, Input, Switch, Space,
@@ -5,6 +9,10 @@ import {
 } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import adminApi from '../../api/adminApi';
+
+
+// Danh sách icon tag có sẵn (tên icon ion-icon + emoji preview)
+// Dùng cho dropdown chọn icon cho tag "HOT", "MỚI"...
 
 const TAG_ICON_OPTIONS = [
   { value: 'flame', label: '🔥 flame (HOT)' },
@@ -16,6 +24,9 @@ const TAG_ICON_OPTIONS = [
   { value: 'pricetag-outline', label: '🏷️ pricetag (GIÁ TỐT)' },
 ];
 
+
+// Các preset gradient nền - giúp admin chọn nhanh, không cần biết CSS
+
 const GRADIENT_PRESETS = [
   { label: 'Xanh đêm (iPhone)', value: 'linear-gradient(135deg, #0a0a1a 0%, #13131f 50%, #0d2137 100%)' },
   { label: 'Navy (Samsung)', value: 'linear-gradient(135deg, #0d0d1a 0%, #141430 50%, #1a2060 100%)' },
@@ -25,14 +36,22 @@ const GRADIENT_PRESETS = [
 ];
 
 const BannerManager: React.FC = () => {
+  // ---- STATE CƠ BẢN ----
   const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  // State riêng cho modal preview (xem trước banner)
   const [previewBanner, setPreviewBanner] = useState<any>(null);
+
   const [form] = Form.useForm();
 
+  // Load banner 1 lần khi vào trang
   useEffect(() => { fetchBanners(); }, []);
+
+
+  // Tải danh sách banner từ BE
 
   const fetchBanners = async () => {
     setLoading(true);
@@ -45,20 +64,26 @@ const BannerManager: React.FC = () => {
     setLoading(false);
   };
 
+ 
+  // Mở modal THÊM MỚI - đặt giá trị mặc định
+  
   const handleAdd = () => {
     setEditingId(null);
     form.resetFields();
     form.setFieldsValue({
       DangHoatDong: true,
-      ThuTu: (banners.length + 1),
+      ThuTu: (banners.length + 1),    // Đẩy ra cuối danh sách
       NutText: 'Mua ngay',
       NutLink: '/products',
       TagIcon: 'flame',
-      MauNen: GRADIENT_PRESETS[0].value,
+      MauNen: GRADIENT_PRESETS[0].value, // Gradient đầu tiên làm mặc định
     });
     setIsModalOpen(true);
   };
 
+  // ----------------------------------------------------------
+  // Mở modal SỬA - nạp data hiện tại vào form
+  // ----------------------------------------------------------
   const handleEdit = (record: any) => {
     setEditingId(record.MaBanner);
     form.setFieldsValue({
@@ -73,11 +98,15 @@ const BannerManager: React.FC = () => {
       TagText: record.TagText,
       TagIcon: record.TagIcon,
       ThuTu: record.ThuTu,
+      // SQL Server trả Bit về: true/false hoặc 1/0 -> chuẩn hoá thành boolean
       DangHoatDong: record.DangHoatDong === true || record.DangHoatDong === 1,
     });
     setIsModalOpen(true);
   };
 
+  // ----------------------------------------------------------
+  // Xoá banner
+  // ----------------------------------------------------------
   const handleDelete = async (id: number) => {
     try {
       await adminApi.deleteBanner(id);
@@ -88,6 +117,10 @@ const BannerManager: React.FC = () => {
     }
   };
 
+  // ----------------------------------------------------------
+  // Lưu form (THÊM hoặc SỬA)
+  // Convert Switch boolean -> 1/0 cho SQL Bit type
+  // ----------------------------------------------------------
   const handleSave = async (values: any) => {
     try {
       const payload = { ...values, DangHoatDong: values.DangHoatDong ? 1 : 0 };
@@ -105,39 +138,36 @@ const BannerManager: React.FC = () => {
     }
   };
 
+  // ----------------------------------------------------------
+  // CẤU HÌNH CỘT BẢNG
+  // ----------------------------------------------------------
   const columns = [
+    // Cột thứ tự
     {
-      title: '#',
-      dataIndex: 'ThuTu',
-      key: 'ThuTu',
-      width: 50,
+      title: '#', dataIndex: 'ThuTu', key: 'ThuTu', width: 50,
       render: (val: number) => <Tag color="blue">{val}</Tag>,
     },
+    // Preview gradient nền dưới dạng ô màu nhỏ
     {
-      title: 'Hình Nền',
-      dataIndex: 'MauNen',
-      key: 'MauNen',
-      width: 80,
+      title: 'Hình Nền', dataIndex: 'MauNen', key: 'MauNen', width: 80,
       render: (bg: string) => (
         <div style={{ width: 48, height: 30, borderRadius: 6, background: bg, border: '1px solid #e0e0e0' }} />
       ),
     },
+    // Thumbnail ảnh sản phẩm trên banner
     {
-      title: 'Ảnh SP',
-      dataIndex: 'HinhAnh',
-      key: 'HinhAnh',
-      width: 70,
+      title: 'Ảnh SP', dataIndex: 'HinhAnh', key: 'HinhAnh', width: 70,
       render: (img: string) => img
         ? <img src={img} alt="banner" style={{ width: 50, height: 34, objectFit: 'contain', borderRadius: 4, background: '#111' }} />
         : <span style={{ color: '#aaa', fontSize: 12 }}>---</span>,
     },
+    // Tiêu đề + tag + tiêu đề phụ
     {
-      title: 'Tiêu Đề',
-      dataIndex: 'TieuDe',
-      key: 'TieuDe',
+      title: 'Tiêu Đề', dataIndex: 'TieuDe', key: 'TieuDe',
       render: (text: string, record: any) => (
         <div>
           <strong style={{ color: '#1677ff' }}>{text}</strong>
+          {/* Hiển thị tag chỉ khi có */}
           {record.TagText && (
             <Tag color="red" style={{ marginLeft: 8, fontSize: 10 }}>{record.TagText}</Tag>
           )}
@@ -146,14 +176,12 @@ const BannerManager: React.FC = () => {
       ),
     },
     {
-      title: 'Giá Hiển Thị',
-      dataIndex: 'GiaHienThi',
-      key: 'GiaHienThi',
+      title: 'Giá Hiển Thị', dataIndex: 'GiaHienThi', key: 'GiaHienThi',
       render: (val: string) => <span style={{ color: '#d48806', fontWeight: 700 }}>{val}</span>,
     },
+    // Hiển thị text + link của nút CTA
     {
-      title: 'Nút CTA',
-      key: 'nut',
+      title: 'Nút CTA', key: 'nut',
       render: (_: any, record: any) => (
         <div style={{ fontSize: 12 }}>
           <div><strong>{record.NutText}</strong></div>
@@ -161,17 +189,16 @@ const BannerManager: React.FC = () => {
         </div>
       ),
     },
+    // Switch read-only chỉ để xem trạng thái (không bấm được)
     {
-      title: 'Trạng Thái',
-      dataIndex: 'DangHoatDong',
-      key: 'DangHoatDong',
+      title: 'Trạng Thái', dataIndex: 'DangHoatDong', key: 'DangHoatDong',
       render: (val: any) => (
         <Switch checked={val === true || val === 1} disabled />
       ),
     },
+    // 3 nút: Xem trước / Sửa / Xoá
     {
-      title: 'Hành Động',
-      key: 'actions',
+      title: 'Hành Động', key: 'actions',
       render: (_: any, record: any) => (
         <Space>
           <Tooltip title="Xem trước">
@@ -181,18 +208,12 @@ const BannerManager: React.FC = () => {
               onClick={() => setPreviewBanner(record)}
             />
           </Tooltip>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => handleEdit(record)}
-          />
+          <Button type="primary" icon={<EditOutlined />} size="small" onClick={() => handleEdit(record)} />
           <Popconfirm
             title="Xóa banner này?"
             description="Thao tác không thể hoàn tác!"
             onConfirm={() => handleDelete(record.MaBanner)}
-            okText="Xóa"
-            cancelText="Hủy"
+            okText="Xóa" cancelText="Hủy"
           >
             <Button danger icon={<DeleteOutlined />} size="small" />
           </Popconfirm>
@@ -203,7 +224,7 @@ const BannerManager: React.FC = () => {
 
   return (
     <div style={{ padding: '0 24px' }}>
-      {/* Header */}
+      {/* ===== Header trang ===== */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
           <h2 style={{ margin: 0 }}>Quản Lý Banner Trang Chủ</h2>
@@ -216,7 +237,7 @@ const BannerManager: React.FC = () => {
         </Button>
       </div>
 
-      {/* Bảng danh sách */}
+      {/* ===== Bảng danh sách banner ===== */}
       <Table
         columns={columns}
         dataSource={banners}
@@ -226,7 +247,9 @@ const BannerManager: React.FC = () => {
         bordered
       />
 
-      {/* Modal Thêm/Sửa */}
+      {/* =========================================================
+          MODAL THÊM/SỬA BANNER
+          ========================================================= */}
       <Modal
         title={editingId ? '✏️ Chỉnh Sửa Banner' : '➕ Tạo Banner Mới'}
         open={isModalOpen}
@@ -237,6 +260,7 @@ const BannerManager: React.FC = () => {
         cancelText="Hủy"
       >
         <Form form={form} layout="vertical" onFinish={handleSave}>
+          {/* Tiêu đề + tiêu đề phụ + mô tả ngắn */}
           <Form.Item name="TieuDe" label="Tiêu đề chính" rules={[{ required: true, message: 'Nhập tiêu đề' }]}>
             <Input placeholder="VD: iPhone 16 Pro Max" />
           </Form.Item>
@@ -249,6 +273,7 @@ const BannerManager: React.FC = () => {
             <Input.TextArea rows={2} placeholder="VD: Camera 48MP, chip A18 Pro, màn hình 6.9&quot;..." />
           </Form.Item>
 
+          {/* 2 cột: Giá + Thứ tự (CSS Grid để xếp ngang) */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Form.Item name="GiaHienThi" label="Giá hiển thị">
               <Input placeholder="VD: Từ 32.900.000 ₫" />
@@ -258,6 +283,7 @@ const BannerManager: React.FC = () => {
             </Form.Item>
           </div>
 
+          {/* 2 cột: Text + Link nút CTA */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Form.Item name="NutText" label="Chữ nút CTA">
               <Input placeholder="VD: Mua ngay" />
@@ -271,6 +297,7 @@ const BannerManager: React.FC = () => {
             <Input placeholder="VD: /image/slide1.png hoặc https://..." />
           </Form.Item>
 
+          {/* 2 cột: Tag text + Tag icon (chọn từ list emoji) */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Form.Item name="TagText" label="Tag nhãn (VD: HOT, MỚI)">
               <Input placeholder="VD: HOT" maxLength={12} />
@@ -280,6 +307,7 @@ const BannerManager: React.FC = () => {
             </Form.Item>
           </div>
 
+          {/* Select gradient với option có ô màu preview + cho phép tự nhập custom */}
           <Form.Item name="MauNen" label="Màu nền gradient">
             <Select
               options={GRADIENT_PRESETS.map(p => ({
@@ -291,6 +319,8 @@ const BannerManager: React.FC = () => {
                   </div>
                 ),
               }))}
+              // dropdownRender: chèn input custom vào dưới dropdown
+              // -> admin có thể nhập gradient CSS riêng nếu muốn
               dropdownRender={(menu) => (
                 <>
                   {menu}
@@ -304,16 +334,21 @@ const BannerManager: React.FC = () => {
             />
           </Form.Item>
 
+          {/* Switch bật/tắt hiển thị */}
           <Form.Item name="DangHoatDong" label="Hiển thị trên website" valuePropName="checked">
             <Switch checkedChildren="Đang hiện" unCheckedChildren="Đã ẩn" />
           </Form.Item>
         </Form>
       </Modal>
 
-      {/* Modal Preview Banner */}
+      {/* =========================================================
+          MODAL XEM TRƯỚC BANNER
+          Hiển thị banner GIỐNG NHƯ trên trang chủ thực tế
+          để admin biết kết quả trước khi lưu
+          ========================================================= */}
       <Modal
         title="👁️ Xem Trước Banner"
-        open={!!previewBanner}
+        open={!!previewBanner}                         // Bool từ object
         onCancel={() => setPreviewBanner(null)}
         footer={null}
         width={800}
@@ -330,6 +365,7 @@ const BannerManager: React.FC = () => {
             minHeight: 200,
           }}>
             <div style={{ color: '#fff', flex: 1 }}>
+              {/* Tag (nếu có) */}
               {previewBanner.TagText && (
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -354,6 +390,7 @@ const BannerManager: React.FC = () => {
                   {previewBanner.GiaHienThi}
                 </p>
               )}
+              {/* Nút CTA preview */}
               <div style={{
                 display: 'inline-block', background: '#d70018', color: '#fff',
                 padding: '10px 24px', borderRadius: 100, fontWeight: 700, fontSize: 14,
@@ -361,6 +398,7 @@ const BannerManager: React.FC = () => {
                 {previewBanner.NutText} →
               </div>
             </div>
+            {/* Ảnh sản phẩm bên phải (nếu có) */}
             {previewBanner.HinhAnh && (
               <img
                 src={previewBanner.HinhAnh}

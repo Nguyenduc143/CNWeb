@@ -1,36 +1,42 @@
-import sql from 'mssql';
-import dotenv from 'dotenv';
-dotenv.config();
 
+
+import sql from 'mssql';                  // Thư viện chính thức kết nối SQL Server
+import dotenv from 'dotenv';               // Đọc biến môi trường từ file .env
+dotenv.config();                            // Nạp .env ngay khi file này được import
+
+// Object cấu hình kết nối, các giá trị nhạy cảm đều lấy từ .env
 const dbConfig: sql.config = {
-  server: process.env.DB_SERVER || 'localhost',
-  port: parseInt(process.env.DB_PORT || '1433'),
-  user: process.env.DB_USER || 'sa',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'CHDT',
+  server: process.env.DB_SERVER || 'localhost',          // Địa chỉ SQL Server
+  port: parseInt(process.env.DB_PORT || '1433'),         // Cổng mặc định SQL Server
+  user: process.env.DB_USER || 'sa',                     // Tài khoản DB
+  password: process.env.DB_PASSWORD || '',               // Mật khẩu DB (KHÔNG hardcode)
+  database: process.env.DB_NAME || 'CHDT',               // Tên database (Cua Hang Dien Thoai)
   options: {
-    encrypt: false,
-    trustServerCertificate: true,
+    encrypt: false,                  // Tắt SSL vì chạy local; production nên bật
+    trustServerCertificate: true,    // Cho phép self-signed cert (chỉ dùng dev)
   },
   pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000,
+    max: 10,                         // Tối đa 10 kết nối song song
+    min: 0,                          // Không giữ kết nối nào khi rảnh
+    idleTimeoutMillis: 30000,        // Kết nối rảnh > 30s sẽ bị đóng
   },
 };
 
-// Singleton pool - chỉ tạo 1 lần duy nhất, tái sử dụng cho mọi request
+
 let poolPromise: Promise<sql.ConnectionPool> | null = null;
+
 
 export const getConnection = async (): Promise<sql.ConnectionPool> => {
   if (!poolPromise) {
+    // Chưa có pool -> tạo mới
     poolPromise = sql.connect(dbConfig)
       .then(pool => {
         console.log('✅ Kết nối CSDL SQL thành công! Pool sẵn sàng.');
         return pool;
       })
       .catch(err => {
-        poolPromise = null; // Reset để cho phép thử lại
+        // Reset về null để lần gọi sau có cơ hội thử lại (chứ không kẹt mãi ở promise lỗi)
+        poolPromise = null;
         console.error('❌ Kết nối CSDL thất bại:', err);
         throw err;
       });

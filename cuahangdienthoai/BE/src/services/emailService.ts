@@ -1,8 +1,21 @@
+
+// FILE: emailService.ts - SERVICE GỬI EMAIL
+
+
+
 import nodemailer from 'nodemailer';
 
 export const emailService = {
+  /**
+   * Gửi mã OTP qua email với template HTML đẹp.
+   * @param toEmail Địa chỉ email nhận
+   * @param otpCode Mã OTP 6 chữ số
+   * @param type    'register' | 'reset_password' (quyết định nội dung email)
+   */
   sendOTP: async (toEmail: string, otpCode: string, type: 'register' | 'reset_password' = 'register') => {
     try {
+      // Tạo transporter cho mỗi lần gọi
+      // (Trong production có thể cache 1 instance để tăng hiệu năng)
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -11,18 +24,20 @@ export const emailService = {
         }
       });
 
-      const subject = type === 'register' 
-        ? 'Mã xác thực đăng ký tài khoản (OTP)' 
+      // Tuỳ loại email mà chọn tiêu đề + nội dung khác nhau
+      const subject = type === 'register'
+        ? 'Mã xác thực đăng ký tài khoản (OTP)'
         : 'Mã xác thực đặt lại mật khẩu (OTP)';
-      
-      const title = type === 'register' 
-        ? 'Xác thực tài khoản của bạn' 
+
+      const title = type === 'register'
+        ? 'Xác thực tài khoản của bạn'
         : 'Yêu cầu đặt lại mật khẩu';
-        
-      const description = type === 'register' 
+
+      const description = type === 'register'
         ? 'Cảm ơn bạn đã đăng ký tài khoản. Để hoàn tất việc đăng ký, vui lòng nhập mã xác thực gồm 6 chữ số dưới đây:'
         : 'Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Vui lòng sử dụng mã xác thực gồm 6 chữ số dưới đây để tiếp tục:';
 
+      // Cấu hình email gồm: from, to, subject, html
       const mailOptions = {
         from: `"Cửa Hàng Điện Thoại" <${process.env.EMAIL_USER}>`,
         to: toEmail,
@@ -43,7 +58,7 @@ export const emailService = {
         `
       };
 
-
+      // Thực sự gửi email (await để đảm bảo lỗi sẽ throw ngược ra service gọi)
       await transporter.sendMail(mailOptions);
       return true;
     } catch (error) {
