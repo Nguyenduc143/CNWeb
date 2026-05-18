@@ -72,7 +72,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# (BỎ rule "public" của Gatsby vì project dùng CRA - cần giữ FE/public/* để serve ảnh tĩnh)
 
 # vuepress build output
 .vuepress/dist
