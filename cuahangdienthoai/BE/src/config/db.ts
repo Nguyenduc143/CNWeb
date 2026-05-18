@@ -12,8 +12,8 @@ const dbConfig: sql.config = {
   password: process.env.DB_PASSWORD || '',               // Mật khẩu DB (KHÔNG hardcode)
   database: process.env.DB_NAME || 'CHDT',               // Tên database (Cua Hang Dien Thoai)
   options: {
-    encrypt: false,                  // Tắt SSL vì chạy local; production nên bật
-    trustServerCertificate: true,    // Cho phép self-signed cert (chỉ dùng dev)
+    encrypt: true,                   // SmarterASP/Azure yêu cầu TLS, local server thì vẫn chạy ổn
+    trustServerCertificate: true,    // Cho phép self-signed cert (host thường dùng)
   },
   pool: {
     max: 10,                         // Tối đa 10 kết nối song song
