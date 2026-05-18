@@ -19,9 +19,11 @@
     "express": "^5.2.1",
     "google-auth-library": "^10.6.2",
     "jsonwebtoken": "^9.0.3",
-    "msnodesqlv8": "^5.1.5",
     "mssql": "^12.2.1",
     "nodemailer": "^8.0.7"
+  },
+  "optionalDependencies": {
+    "msnodesqlv8": "^5.1.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
